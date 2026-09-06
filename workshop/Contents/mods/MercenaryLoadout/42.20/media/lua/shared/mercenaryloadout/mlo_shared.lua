@@ -673,7 +673,7 @@ M.UPGRADES = {
         labelKey = "IGUI_MLO_Upgrade_BeltKeyClip",
         time = 650, tailoring = 2,
         sources = {
-            { sourceTag = "KEY_RING", missingKey = "IGUI_MLO_Error_SourceKeyRing" },
+            { sourceTag = "KEY_RING", sourceEmpty = true, missingKey = "IGUI_MLO_Error_SourceKeyRing" },
             { sourceTag = "KEY_RING", sourceEmpty = true, missingKey = "IGUI_MLO_Error_SourceKeyRing" },
             { sourceTag = "KEY_RING", sourceEmpty = true, missingKey = "IGUI_MLO_Error_SourceKeyRing" },
         },

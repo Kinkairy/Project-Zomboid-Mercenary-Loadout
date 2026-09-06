@@ -593,9 +593,9 @@
     },
     {
       "key": "IGUI_MLO_Error_SourceKeyRing",
-      "en": "Three key rings or keychains are required",
-      "cn": "需要3个钥匙圈或钥匙扣",
-      "ch": "需要3個鑰匙圈或鑰匙扣",
+      "en": "Three empty key rings or keychains are required",
+      "cn": "需要3个空钥匙圈或钥匙扣",
+      "ch": "需要3個空鑰匙圈或鑰匙扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -609,9 +609,9 @@
     },
     {
       "key": "IGUI_MLO_SourceTag_KEY_RING",
-      "en": "Key ring",
-      "cn": "钥匙圈",
-      "ch": "鑰匙圈",
+      "en": "Empty key ring or keychain",
+      "cn": "空钥匙圈或钥匙扣",
+      "ch": "空鑰匙圈或鑰匙扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
