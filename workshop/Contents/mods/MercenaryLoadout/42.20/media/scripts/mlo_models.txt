@@ -1,0 +1,251 @@
+module MercenaryLoadout
+{
+    model MLO_SportsBottle_Attached
+    {
+        mesh = WorldItems/Sportsbottle,
+        scale = 0.10,
+        attachment Bip01_Prop1
+        {
+            offset = 0.0296 -0.0095 -0.0088,
+            rotate = -2.7408 26.4308 33.5362,
+        }
+        attachment Bip01_Prop2
+        {
+            offset = 0.0038 -0.0087 0.0043,
+            rotate = -0.6276 -24.7235 3.8283,
+            scale = 0.8247,
+        }
+    }
+
+    model MLO_PropaneLantern_Attached
+    {
+        mesh = Lantern_Propane_HandleUp,
+        texture = WorldItems/Lantern_Propane,
+        scale = 0.06,
+        attachment Bip01_Prop1
+        {
+            offset = 0.014 0.0096 -0.2286,
+            rotate = -87.2964 -86.6288 -176.4969,
+        }
+        attachment Bip01_Prop2
+        {
+            offset = -0.0093 0.0106 -0.2381,
+            rotate = -75.8924 85.6812 164.4082,
+        }
+    }
+
+    model MLO_FirstAidBox_Attached
+    {
+        mesh = WorldItems/Clothing/PlasticLunchBox_Ground,
+        texture = Clothes/Bag/PlasticLunchBox_Medic,
+        scale = 0.28,
+    }
+
+    model MLO_FirstAidCamping_Attached
+    {
+        mesh = WorldItems/FirstAid_Camping,
+        scale = 0.05,
+    }
+
+    model MLO_FirstAidMilitary_Attached
+    {
+        mesh = WorldItems/FirstAid_Military,
+        scale = 0.055,
+    }
+
+    model MLO_Toolbox_Attached
+    {
+        mesh = WorldItems/Clothing/ToolBox_Ground,
+        texture = Clothes/Bag/ToolBox,
+        scale = 0.25,
+    }
+
+    model MLO_ToolboxWooden_Attached
+    {
+        mesh = WorldItems/Clothing/ToolBox_Crafted,
+        texture = WorldItems/Clothing/ToolBox_Crafted,
+        scale = 0.0625,
+    }
+
+    model MLO_CDPlayer_Attached
+    {
+        mesh = WorldItems/CDplayer,
+        texture = CDplayer,
+        scale = 0.5,
+    }
+
+    model MLO_RadioBlack_Attached
+    {
+        mesh = WorldItems/Radio,
+        texture = WorldItems/RadioBlack,
+        scale = 0.24,
+    }
+
+    model MLO_RadioRed_Attached
+    {
+        mesh = WorldItems/Radio,
+        texture = WorldItems/RadioRed,
+        scale = 0.24,
+    }
+
+    model MLO_RadioBlue_Attached
+    {
+        mesh = WorldItems/Radio,
+        texture = WorldItems/Radio,
+        scale = 0.24,
+    }
+
+    model MLO_WeldingMask_Attached
+    {
+        mesh = Static/Clothes/M_WelderMask,
+        texture = Clothes/Hat/WelderMask,
+        scale = 0.65,
+    }
+
+    model MLO_BuildersRespirator_Attached
+    {
+        mesh = WorldItems/Clothing/M_BuildersMask_Ground,
+        texture = buildersrespirator,
+        scale = 0.125,
+    }
+
+    model MLO_BuildersRespiratorNoFilter_Attached
+    {
+        mesh = WorldItems/Clothing/M_BuildersMask_nofilter_Ground,
+        texture = buildersrespirator,
+        scale = 0.125,
+    }
+
+    model MLO_GasMask_Attached
+    {
+        mesh = WorldItems/Clothing/M_GasMask_FilterLess_Ground,
+        texture = clothes/hat/gasmask,
+        scale = 0.125,
+    }
+
+    model MLO_NBCMask_Attached
+    {
+        mesh = WorldItems/NBC_Mask_Ground,
+        texture = NBC_Mask,
+        scale = 0.25,
+    }
+
+    model MLO_HockeyMask_Attached
+    {
+        mesh = WorldItems/Clothing/M_HockeyMask_Ground,
+        texture = clothes/hat/hockeymask,
+        scale = 0.125,
+    }
+
+    model MLO_Mask_Hat_ImprovisedGasMask
+    {
+        mesh = Static/Clothes/M_ImprovisedGasMask,
+        texture = clothes/hat/improvisedgasmask,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_ImprovisedGasMask_nofilter
+    {
+        mesh = Static/Clothes/M_ImprovisedGasMask_nofilter,
+        texture = clothes/hat/improvisedgasmask,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HalloweenMaskDevil
+    {
+        mesh = Static/Clothes/M_Mask,
+        texture = clothes/hat/halloweenmask_devil,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HalloweenMaskMonster
+    {
+        mesh = Static/Clothes/M_Mask,
+        texture = clothes/hat/halloweenmask_monster,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HalloweenMaskPumpkin
+    {
+        mesh = Static/Clothes/M_Mask,
+        texture = clothes/hat/halloweenmask_pumpkin,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HalloweenMaskSkeleton
+    {
+        mesh = Static/Clothes/M_Mask,
+        texture = clothes/hat/halloweenmask_skeleton,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HalloweenMaskVampire
+    {
+        mesh = Static/Clothes/M_Mask,
+        texture = clothes/hat/halloweenmask_vampire,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HalloweenMaskWitch
+    {
+        mesh = Static/Clothes/M_Mask,
+        texture = clothes/hat/halloweenmask_witch,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_Hide
+    {
+        mesh = Static/Clothes/M_HockeyMask,
+        texture = clothes/armor/hockeymask_leather,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_BoneMask
+    {
+        mesh = Static/Clothes/M_BoneMask,
+        texture = clothes/armor/bonemask,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_Wood
+    {
+        mesh = Static/Clothes/M_HockeyMask,
+        texture = clothes/armor/hockeymask_wood,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_Metal
+    {
+        mesh = Static/Clothes/M_HockeyMask,
+        texture = clothes/armor/hockeymask_metal,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_Copper
+    {
+        mesh = Static/Clothes/M_HockeyMask,
+        texture = clothes/armor/hockeymask_copper,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_Gold
+    {
+        mesh = Static/Clothes/M_HockeyMask,
+        texture = clothes/armor/hockeymask_gold,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_Silver
+    {
+        mesh = Static/Clothes/M_HockeyMask,
+        texture = clothes/armor/hockeymask_silver,
+        scale = 0.65,
+    }
+
+    model MLO_Mask_Hat_HockeyMask_MetalScrap
+    {
+        mesh = WorldItems/Clothing/M_HockeyMask_Ground,
+        texture = clothes/armor/hockeymask_metal_basic,
+        scale = 0.125,
+    }
+}

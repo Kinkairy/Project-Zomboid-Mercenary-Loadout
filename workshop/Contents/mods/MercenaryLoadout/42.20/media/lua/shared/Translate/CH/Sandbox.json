@@ -1,0 +1,15 @@
+{
+  "Sandbox_MercenaryLoadout": "傭兵裝備",
+  "Sandbox_MercenaryLoadout_Backpack": "啟用傭兵戰術背包",
+  "Sandbox_MercenaryLoadout_Backpack_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+  "Sandbox_MercenaryLoadout_ALICE": "啟用傭兵戰術背帶",
+  "Sandbox_MercenaryLoadout_ALICE_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+  "Sandbox_MercenaryLoadout_Belt": "啟用傭兵戰術皮帶",
+  "Sandbox_MercenaryLoadout_Belt_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+  "Sandbox_MercenaryLoadout_Arm": "啟用傭兵戰術護臂",
+  "Sandbox_MercenaryLoadout_Arm_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+  "Sandbox_MercenaryLoadout_Thigh": "啟用傭兵戰術護腿",
+  "Sandbox_MercenaryLoadout_Thigh_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+  "Sandbox_MercenaryLoadout_Greave": "啟用傭兵戰術護脛",
+  "Sandbox_MercenaryLoadout_Greave_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。"
+}

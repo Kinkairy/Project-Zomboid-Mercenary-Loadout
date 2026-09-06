@@ -1,0 +1,150 @@
+
+module MercenaryLoadout
+{
+    item MLO_KeyClip
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.05,
+        Capacity = 10,
+        WeightReduction = 85,
+        Icon = Keyring_SRing_Gold,
+        OpenSound = OpenKeyRing,
+        CloseSound = CloseKeyRing,
+        PutInSound = StoreItemKeyRing,
+        AcceptItemFunction = AcceptItemFunction.KeyRing,
+        hidden = true,
+    }
+
+    item MLO_Pouch2
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.2,
+        Capacity = 2,
+        WeightReduction = 85,
+        Icon = Satchel_Military,
+        hidden = true,
+    }
+
+    item MLO_Pouch3
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.25,
+        Capacity = 3,
+        WeightReduction = 85,
+        Icon = Satchel_Military,
+        hidden = true,
+    }
+
+    item MLO_SidePouch
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Capacity = 5,
+        WeightReduction = 65,
+        Icon = Satchel_Military,
+        hidden = true,
+    }
+
+    item MLO_BulletPouch
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Capacity = 5,
+        WeightReduction = 65,
+        Icon = Satchel_Military,
+        Tags = base:reloadfastbullets,
+        hidden = true,
+    }
+
+    item MLO_ShellPouch
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Capacity = 5,
+        WeightReduction = 65,
+        Icon = Satchel_Military,
+        Tags = base:reloadfastshells,
+        hidden = true,
+    }
+
+    item MLO_PackTopPouch
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.2,
+        Capacity = 2,
+        WeightReduction = 85,
+        Icon = Satchel_Military,
+        hidden = true,
+    }
+
+    item MLO_PackSidePouchL
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Capacity = 3,
+        WeightReduction = 65,
+        Icon = Satchel_Military,
+        hidden = true,
+    }
+
+    item MLO_PackSidePouchR
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Capacity = 3,
+        WeightReduction = 65,
+        Icon = Satchel_Military,
+        hidden = true,
+    }
+
+    item MLO_MagPanel
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Capacity = 5,
+        WeightReduction = 85,
+        Icon = AmmoStrap_Leather,
+        AcceptItemFunction = MercenaryAcceptItemFunction.Magazines,
+        Tags = reloadfastmagazines,
+        hidden = true,
+    }
+
+    item MLO_FirstAidModule
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 1.0,
+        Capacity = 4,
+        WeightReduction = 50,
+        Icon = FirstAid,
+        CloseSound = CloseSmallMetalBox,
+        OpenSound = OpenSmallMetalBox,
+        PutInSound = StoreItemSmallMetalBox,
+        Medical = true,
+        hidden = true,
+    }
+
+    item MLO_ToolboxModule
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 2.0,
+        Capacity = 8,
+        WeightReduction = 50,
+        Icon = Toolbox,
+        CloseSound = CloseMetalToolbox,
+        OpenSound = OpenMetalToolbox,
+        PutInSound = StoreItemMetalToolbox,
+        hidden = true,
+    }
+}

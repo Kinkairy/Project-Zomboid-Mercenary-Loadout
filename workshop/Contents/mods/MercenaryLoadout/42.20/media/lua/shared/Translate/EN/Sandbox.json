@@ -1,0 +1,15 @@
+{
+  "Sandbox_MercenaryLoadout": "Mercenary Loadout",
+  "Sandbox_MercenaryLoadout_Backpack": "Enable Mercenary Tactical Pack",
+  "Sandbox_MercenaryLoadout_Backpack_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+  "Sandbox_MercenaryLoadout_ALICE": "Enable Mercenary Tactical Rig",
+  "Sandbox_MercenaryLoadout_ALICE_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+  "Sandbox_MercenaryLoadout_Belt": "Enable Mercenary Tactical Belt",
+  "Sandbox_MercenaryLoadout_Belt_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+  "Sandbox_MercenaryLoadout_Arm": "Enable Mercenary Tactical Vambraces",
+  "Sandbox_MercenaryLoadout_Arm_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+  "Sandbox_MercenaryLoadout_Thigh": "Enable Mercenary Tactical Thigh Guards",
+  "Sandbox_MercenaryLoadout_Thigh_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+  "Sandbox_MercenaryLoadout_Greave": "Enable Mercenary Tactical Greaves",
+  "Sandbox_MercenaryLoadout_Greave_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again."
+}

@@ -1,0 +1,25 @@
+VERSION = 1,
+
+option MercenaryLoadout.Backpack = {
+    type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_Backpack,
+}
+
+option MercenaryLoadout.ALICE = {
+    type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_ALICE,
+}
+
+option MercenaryLoadout.Belt = {
+    type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_Belt,
+}
+
+option MercenaryLoadout.Arm = {
+    type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_Arm,
+}
+
+option MercenaryLoadout.Thigh = {
+    type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_Thigh,
+}
+
+option MercenaryLoadout.Greave = {
+    type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_Greave,
+}

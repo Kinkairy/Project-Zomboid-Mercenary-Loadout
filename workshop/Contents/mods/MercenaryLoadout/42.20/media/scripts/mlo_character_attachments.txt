@@ -1,0 +1,328 @@
+module Base
+{
+    model FemaleBody
+    {
+        attachment mlo_belt_holster_left
+        {
+            offset = 0.0500 0.1303 -0.0299,
+            rotate = 179.0000 20.0000 94.0000,
+            scale = 0.8500,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_belt_holster_right
+        {
+            offset = 0.0500 -0.1294 -0.0299,
+            rotate = -339.0000 179.0000 -94.0000,
+            scale = 0.8500,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_rig_shoulder_left
+        {
+            offset = 0.0247 0.0864 0.0823,
+            rotate = 7.4110 -60.5349 88.0811,
+            bone = Bip01_Spine1,
+        }
+        attachment mlo_rig_shoulder_right
+        {
+            offset = 0.0247 -0.0864 0.0823,
+            rotate = 7.4110 -60.5349 88.0811,
+            bone = Bip01_Spine1,
+        }
+        attachment mlo_belt_tool_left
+        {
+            offset = 0.0500 0.0450 -0.0800,
+            rotate = 90.0000 -10.0000 100.0000,
+            scale = 0.8000,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_belt_tool_right
+        {
+            offset = 0.0500 -0.0450 -0.0800,
+            rotate = 90.0000 190.0000 -100.0000,
+            scale = 0.8000,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_thigh_pistol_left
+        {
+            offset = 0.0600 -0.0700 0.0030,
+            rotate = 180.0000 0.0000 -90.0000,
+            bone = Bip01_L_Thigh,
+        }
+        attachment mlo_thigh_pistol_right
+        {
+            offset = 0.0600 0.0700 0.0030,
+            rotate = -359.0000 180.0000 90.0000,
+            bone = Bip01_R_Thigh,
+        }
+        attachment mlo_greave_knife_left
+        {
+            offset = 0.0599 -0.0376 -0.0162,
+            rotate = 0.0000 0.0000 -90.0000,
+            scale = 0.6500,
+            bone = Bip01_L_Calf,
+        }
+        attachment mlo_greave_knife_right
+        {
+            offset = 0.0599 0.0376 -0.0162,
+            rotate = 0.0000 0.0000 -90.0000,
+            scale = 0.6500,
+            bone = Bip01_R_Calf,
+        }
+        attachment mlo_pack_water_left
+        {
+            offset = 0.0600 0.1350 -0.0950,
+            rotate = 91.0 -6.0 -4.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_toolbox_left_pocket
+        {
+            offset = 0.0180 0.0000 -0.2450,
+            rotate = 90.0 180.0 0.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_medbox_side
+        {
+            offset = 0.0100 0.1530 -0.0250,
+            rotate = 180.0 0.0 90.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_mask_right_upper
+        {
+            offset = 0.0600 -0.0640 -0.0200,
+            rotate = 80.0 70.0 80.0,
+            scale = 1.4000,
+            bone = Bip01_BackPack,
+        }
+
+        attachment mlo_pack_mask_right_upper_gas_hockey
+        {
+            offset = 0.0600 -0.0640 0.0500,
+            rotate = 80.0 160.0 80.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_mask_right_upper_nbc
+        {
+            offset = 0.0800 -0.0840 0.0300,
+            rotate = 160.0 200.0 80.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_mask_right_upper_welding_mask
+        {
+            offset = 0.0600 -0.0640 0.0100,
+            rotate = 80.0 70.0 80.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_lantern_right
+        {
+            offset = 0.0600 -0.1200 -0.0950,
+            rotate = 91.0 -6.0 -4.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_device_left_upper
+        {
+            offset = 0.0700 0.0670 0.0350,
+            rotate = 100.0 0.0 0.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_device_left_upper_radio
+        {
+            offset = 0.0700 0.0670 0.0350,
+            rotate = 100.0 -90.0 0.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_device_left_upper_cdplayer
+        {
+            offset = 0.0700 0.0670 0.0350,
+            rotate = 30.0 -20.0 280.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_plush_right
+        {
+            offset = 0.0600 -0.0810 -0.2320,
+            rotate = 90.0 -100.0 0.0,
+            scale = 0.6500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_plush_right_spiffo
+        {
+            offset = 0.0600 -0.0810 -0.2320,
+            rotate = 90.0 60.0 0.0,
+            scale = 0.6500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_plush_right_pancho_dog
+        {
+            offset = 0.0600 -0.0610 -0.2320,
+            rotate = 90.0 -10.0 0.0,
+            scale = 0.6500,
+            bone = Bip01_BackPack,
+        }
+    }
+
+    model MaleBody
+    {
+        attachment mlo_belt_holster_left
+        {
+            offset = 0.050 0.1300 -0.0065,
+            rotate = 179.0000 20.0000 94.0000,
+            scale = 0.8500,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_belt_holster_right
+        {
+            offset = 0.050 -0.1300 -0.0065,
+            rotate = 20.0000 179.0000 -94.0000,
+            scale = 0.8500,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_rig_shoulder_left
+        {
+            offset = 0.0138 0.0950 0.0822,
+            rotate = 10.3088 -51.0866 93.3513,
+            bone = Bip01_Spine1,
+        }
+        attachment mlo_rig_shoulder_right
+        {
+            offset = 0.0138 -0.0950 0.0822,
+            rotate = 10.3088 -51.0866 93.3513,
+            bone = Bip01_Spine1,
+        }
+        attachment mlo_belt_tool_left
+        {
+            offset = 0.0500 0.0450 -0.0800,
+            rotate = 90.0000 -10.0000 100.0000,
+            scale = 0.8000,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_belt_tool_right
+        {
+            offset = 0.0500 -0.0450 -0.0800,
+            rotate = 90.0000 190.0000 -100.0000,
+            scale = 0.8000,
+            bone = Bip01_Pelvis,
+        }
+        attachment mlo_thigh_pistol_left
+        {
+            offset = 0.0600 -0.0700 0.0030,
+            rotate = 180.0000 0.0000 -90.0000,
+            bone = Bip01_L_Thigh,
+        }
+        attachment mlo_thigh_pistol_right
+        {
+            offset = 0.0600 0.0700 0.0030,
+            rotate = 0.0000 180.0000 90.0000,
+            bone = Bip01_R_Thigh,
+        }
+        attachment mlo_greave_knife_left
+        {
+            offset = 0.0600 -0.0394 -0.0030,
+            rotate = 0.0 0.0 -90.0,
+            scale = 0.6500,
+            bone = Bip01_L_Calf,
+        }
+        attachment mlo_greave_knife_right
+        {
+            offset = 0.0600 0.0394 -0.0030,
+            rotate = 0.0 0.0 -90.0,
+            scale = 0.6500,
+            bone = Bip01_R_Calf,
+        }
+        attachment mlo_pack_water_left
+        {
+            offset = 0.0820 0.1360 -0.0950,
+            rotate = 91.0 -6.0 -4.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_toolbox_left_pocket
+        {
+            offset = 0.0400 0.0000 -0.2450,
+            rotate = 90.0 180.0 0.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_medbox_side
+        {
+            offset = 0.0320 0.1540 -0.0250,
+            rotate = 180.0 0.0 90.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_mask_right_upper
+        {
+            offset = 0.0820 -0.0650 -0.0200,
+            rotate = 80.0 70.0 80.0,
+            scale = 1.4000,
+            bone = Bip01_BackPack,
+        }
+
+        attachment mlo_pack_mask_right_upper_gas_hockey
+        {
+            offset = 0.0820 -0.0650 0.0500,
+            rotate = 80.0 160.0 80.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_mask_right_upper_nbc
+        {
+            offset = 0.1020 -0.0850 0.0300,
+            rotate = 160.0 200.0 80.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_mask_right_upper_welding_mask
+        {
+            offset = 0.0820 -0.0650 0.0100,
+            rotate = 80.0 70.0 80.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_lantern_right
+        {
+            offset = 0.0820 -0.1210 -0.0950,
+            rotate = 91.0 -6.0 -4.0,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_device_left_upper
+        {
+            offset = 0.0920 0.0680 0.0350,
+            rotate = 100.0 0.0 0.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_device_left_upper_radio
+        {
+            offset = 0.0920 0.0680 0.0350,
+            rotate = 100.0 -90.0 0.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_device_left_upper_cdplayer
+        {
+            offset = 0.0920 0.0680 0.0350,
+            rotate = 30.0 -20.0 280.0,
+            scale = 0.8500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_plush_right
+        {
+            offset = 0.0820 -0.0820 -0.2320,
+            rotate = 90.0 -100.0 0.0,
+            scale = 0.6500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_plush_right_spiffo
+        {
+            offset = 0.0820 -0.0820 -0.2320,
+            rotate = 90.0 60.0 0.0,
+            scale = 0.6500,
+            bone = Bip01_BackPack,
+        }
+        attachment mlo_pack_plush_right_pancho_dog
+        {
+            offset = 0.0820 -0.0620 -0.2320,
+            rotate = 90.0 -10.0 0.0,
+            scale = 0.6500,
+            bone = Bip01_BackPack,
+        }
+    }
+}

@@ -1,0 +1,1811 @@
+{
+  "schema": 1,
+  "languages": [
+    "EN",
+    "CN",
+    "CH"
+  ],
+  "alignment_rule": "same key, same player-visible meaning",
+  "entries": [
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Belt_HolsterL",
+      "en": "Left Waist Holster",
+      "cn": "左腰枪套",
+      "ch": "左腰槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Belt_HolsterR",
+      "en": "Right Waist Holster",
+      "cn": "右腰枪套",
+      "ch": "右腰槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Belt_ToolL",
+      "en": "Left Belt Clip",
+      "cn": "腰带左挂扣",
+      "ch": "腰帶左掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Belt_ToolR",
+      "en": "Right Belt Clip",
+      "cn": "腰带右挂扣",
+      "ch": "腰帶右掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_CDPlayer",
+      "en": "Electronic Device Hook",
+      "cn": "电子设备挂扣",
+      "ch": "電子設備掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_Lantern",
+      "en": "Lantern Hook",
+      "cn": "提灯挂扣",
+      "ch": "提燈掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_MedBox",
+      "en": "First Aid Kit Hook",
+      "cn": "急救箱挂扣",
+      "ch": "急救箱掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_SportBottle",
+      "en": "Bottle Hook",
+      "cn": "水壶挂扣",
+      "ch": "水壺掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_Toolbox",
+      "en": "Toolbox Hook",
+      "cn": "工具箱挂扣",
+      "ch": "工具箱掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_WeldingMask",
+      "en": "Mask Hook",
+      "cn": "面罩挂扣",
+      "ch": "面罩掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Rig_PistolL",
+      "en": "Left Shoulder Holster",
+      "cn": "左肩枪套",
+      "ch": "左肩槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Rig_PistolR",
+      "en": "Right Shoulder Holster",
+      "cn": "右肩枪套",
+      "ch": "右肩槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Rig_RifleL",
+      "en": "Left Rifle Sling",
+      "cn": "左长枪肩带",
+      "ch": "左長槍肩帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Rig_RifleR",
+      "en": "Right Rifle Sling",
+      "cn": "右长枪肩带",
+      "ch": "右長槍肩帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Thigh_KnifeL",
+      "en": "Left Thigh Knife",
+      "cn": "左腿匕首位",
+      "ch": "左腿匕首位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Thigh_KnifeR",
+      "en": "Right Thigh Knife",
+      "cn": "右腿匕首位",
+      "ch": "右腿匕首位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_AttachmentParent_Pack",
+      "en": "Backpack",
+      "cn": "背包",
+      "ch": "背包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_AllComplete",
+      "en": "All upgrades installed",
+      "cn": "已完成全部改装",
+      "ch": "已完成全部改裝",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_AttachItem",
+      "en": "%1 %2",
+      "cn": "%1 %2",
+      "ch": "%1 %2",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_Manage",
+      "en": "Manage Attachments",
+      "cn": "外挂管理",
+      "ch": "外掛管理",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_NoCompatibleItem",
+      "en": "No compatible item",
+      "cn": "没有兼容物品",
+      "ch": "沒有相容物品",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_RemoveFromParent",
+      "en": "Remove from %1",
+      "cn": "从%1中移除",
+      "ch": "從%1中移除",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_SlotItem",
+      "en": "%1: %2",
+      "cn": "%1：%2",
+      "ch": "%1：%2",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Context_Upgrade",
+      "en": "Mercenary Upgrades",
+      "cn": "雇佣兵改装",
+      "ch": "傭兵改裝",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_AlreadyInstalled",
+      "en": "Upgrade already installed",
+      "cn": "该改装已安装",
+      "ch": "該改裝已安裝",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_AlreadyMounted",
+      "en": "Item is already mounted in %1",
+      "cn": "物品已挂载在 %1",
+      "ch": "物品已掛載在 %1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_AttachmentMissing",
+      "en": "Equipment or attachment is no longer in your inventory",
+      "cn": "装备或外挂已不在随身物品中",
+      "ch": "裝備或外掛已不在隨身物品中",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_BuildAttachments",
+      "en": "Could not update attachment slots",
+      "cn": "无法更新外挂槽位",
+      "ch": "無法更新外掛欄位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_ConsumeMaterial",
+      "en": "Could not consume %1",
+      "cn": "无法消耗 %1",
+      "ch": "無法消耗 %1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_ContainerTooFull",
+      "en": "Container is too full for this change",
+      "cn": "容器内容过多，无法更改",
+      "ch": "容器內容過多，無法變更",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_CreateModule",
+      "en": "Could not create %1",
+      "cn": "无法创建 %1",
+      "ch": "無法建立 %1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_EmptyPartRequired",
+      "en": "A compatible empty part is required",
+      "cn": "需要兼容且已清空的部件",
+      "ch": "需要相容且已清空的零件",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_EmptySlot",
+      "en": "Attachment slot is empty",
+      "cn": "外挂槽为空",
+      "ch": "外掛欄為空",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_EquipmentMissing",
+      "en": "Equipment is no longer in your inventory",
+      "cn": "装备已不在随身物品中",
+      "ch": "裝備已不在隨身物品中",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_Generic",
+      "en": "Action failed",
+      "cn": "操作失败",
+      "ch": "操作失敗",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_Incompatible",
+      "en": "Item is not compatible with this slot",
+      "cn": "物品与该槽位不兼容",
+      "ch": "物品與該欄位不相容",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_InvalidCapacity",
+      "en": "Invalid container capacity",
+      "cn": "容器容量无效",
+      "ch": "容器容量無效",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_InvalidContainer",
+      "en": "Invalid container",
+      "cn": "容器无效",
+      "ch": "容器無效",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_InvalidEquipment",
+      "en": "Invalid equipment",
+      "cn": "装备无效",
+      "ch": "裝備無效",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_InvalidItem",
+      "en": "Invalid item",
+      "cn": "物品无效",
+      "ch": "物品無效",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_InvalidModule",
+      "en": "Invalid attachment module",
+      "cn": "外挂模块无效",
+      "ch": "外掛模組無效",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_InvalidPlayer",
+      "en": "Invalid player",
+      "cn": "玩家状态无效",
+      "ch": "玩家狀態無效",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_ItemNotInInventory",
+      "en": "Item is no longer in your inventory",
+      "cn": "物品已不在随身物品中",
+      "ch": "物品已不在隨身物品中",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_LanternMissing",
+      "en": "Mounted propane lantern not found",
+      "cn": "找不到已挂载的丙烷灯",
+      "ch": "找不到已掛載的丙烷燈",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_LanternSlot",
+      "en": "No valid propane lantern slot found",
+      "cn": "找不到有效的丙烷灯挂位",
+      "ch": "找不到有效的丙烷燈掛位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_LanternToggle",
+      "en": "Could not change propane lantern state",
+      "cn": "无法切换丙烷灯状态",
+      "ch": "無法切換丙烷燈狀態",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_LinkModule",
+      "en": "Could not link the attachment module",
+      "cn": "无法绑定外挂模块",
+      "ch": "無法連結外掛模組",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_MagazineChestRig",
+      "en": "An empty Chest Rig, or one containing magazines only, is required",
+      "cn": "需要空弹挂，或只装有弹匣的弹挂",
+      "ch": "需要空彈掛，或只裝有彈匣的彈掛",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_MaterialPlan",
+      "en": "Could not prepare required materials",
+      "cn": "无法准备所需材料",
+      "ch": "無法準備所需材料",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_MissingMaterial",
+      "en": "Missing %1 x%2",
+      "cn": "缺少 %1 x%2",
+      "ch": "缺少 %1 x%2",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_MissingTool",
+      "en": "Required tool: %1",
+      "cn": "需要工具：%1",
+      "ch": "需要工具：%1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_MoveToInventory",
+      "en": "Could not move item to your main inventory",
+      "cn": "无法将物品移入主物品栏",
+      "ch": "無法將物品移入主要物品欄",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_NotContainer",
+      "en": "Selected item is not a container",
+      "cn": "所选物品不是容器",
+      "ch": "所選物品不是容器",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_PartRequired",
+      "en": "A compatible part is required",
+      "cn": "需要兼容部件",
+      "ch": "需要相容零件",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_PrepareOutput",
+      "en": "Could not prepare upgrade output",
+      "cn": "无法准备改装产物",
+      "ch": "無法準備改裝產物",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_ReadAttachments",
+      "en": "Could not read attachment slots",
+      "cn": "无法读取外挂槽位",
+      "ch": "無法讀取外掛欄位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_ReadContainer",
+      "en": "Could not read container contents",
+      "cn": "无法读取容器内容",
+      "ch": "無法讀取容器內容",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_RemoveContent",
+      "en": "Could not remove container contents",
+      "cn": "无法取出容器内容",
+      "ch": "無法取出容器內容",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_RemoveFromContainer",
+      "en": "Could not remove item from its container",
+      "cn": "无法从容器取出物品",
+      "ch": "無法從容器取出物品",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_RemoveSource",
+      "en": "Could not consume the required part",
+      "cn": "无法消耗所需部件",
+      "ch": "無法消耗所需零件",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_RestoreModuleState",
+      "en": "Could not restore the attachment's previous state",
+      "cn": "无法恢复外挂原状态",
+      "ch": "無法還原外掛原狀態",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_RollbackFailed",
+      "en": "Action failed and recovery was incomplete",
+      "cn": "操作失败，且未能完整恢复",
+      "ch": "操作失敗，且未能完整還原",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SaveUpgrade",
+      "en": "Could not save upgrade state",
+      "cn": "无法保存改装状态",
+      "ch": "無法儲存改裝狀態",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SetCapacity",
+      "en": "Could not set container capacity",
+      "cn": "无法设置容器容量",
+      "ch": "無法設定容器容量",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SetModuleCapacity",
+      "en": "Could not set attachment capacity",
+      "cn": "无法设置外挂容量",
+      "ch": "無法設定外掛容量",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SetWeightReduction",
+      "en": "Could not set weight reduction",
+      "cn": "无法设置减重",
+      "ch": "無法設定減重",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SkillLevel",
+      "en": "Requires %1 level %2",
+      "cn": "需要%1 %2级",
+      "ch": "需要%1 %2級",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SlotConflict",
+      "en": "Attachment is already linked elsewhere",
+      "cn": "外挂已绑定到其他位置",
+      "ch": "外掛已連結到其他位置",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SlotMismatch",
+      "en": "Attachment link does not match this slot",
+      "cn": "外挂链接与槽位不符",
+      "ch": "外掛連結與欄位不符",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SlotNotEnabled",
+      "en": "This attachment slot has not been unlocked",
+      "cn": "该外挂槽尚未解锁",
+      "ch": "該外掛欄尚未解鎖",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SlotOccupied",
+      "en": "This attachment slot is occupied",
+      "cn": "该外挂槽已有物品",
+      "ch": "該外掛欄已有物品",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourceBulletStrap",
+      "en": "Required Bullets Bandolier is missing",
+      "cn": "缺少所需子弹弹带",
+      "ch": "缺少所需子彈彈帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourceChestRig",
+      "en": "Required Chest Rig is missing",
+      "cn": "缺少所需弹挂",
+      "ch": "缺少所需彈掛",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourceKeyRing",
+      "en": "Three key rings or keychains are required",
+      "cn": "需要3个钥匙圈或钥匙扣",
+      "ch": "需要3個鑰匙圈或鑰匙扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourceNotInInventory",
+      "en": "Required part is no longer in your inventory",
+      "cn": "所需部件已不在随身物品中",
+      "ch": "所需零件已不在隨身物品中",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceTag_KEY_RING",
+      "en": "Key ring",
+      "cn": "钥匙圈",
+      "ch": "鑰匙圈",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourcePouch",
+      "en": "Required Fanny Pack is missing",
+      "cn": "缺少所需腰包",
+      "ch": "缺少所需腰包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourceShellStrap",
+      "en": "Required Shells Bandolier is missing",
+      "cn": "缺少所需霰弹弹带",
+      "ch": "缺少所需霰彈彈帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SourceSideBag",
+      "en": "Required Satchel or Sling Bag is missing",
+      "cn": "缺少所需挎包或单肩包",
+      "ch": "缺少所需側背包或單肩包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SyncAttachmentModel",
+      "en": "Could not synchronize the attachment model",
+      "cn": "无法同步外挂模型",
+      "ch": "無法同步外掛模型",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SyncAttachments",
+      "en": "Could not synchronize attachment slots",
+      "cn": "无法同步外挂槽位",
+      "ch": "無法同步外掛欄位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SyncEquipParent",
+      "en": "Could not synchronize the attachment with its equipment",
+      "cn": "无法同步外挂与装备",
+      "ch": "無法同步外掛與裝備",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SyncSlot",
+      "en": "Could not synchronize the attachment slot",
+      "cn": "无法同步外挂槽位",
+      "ch": "無法同步外掛欄位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_SyncState",
+      "en": "Could not synchronize equipment state",
+      "cn": "无法同步装备状态",
+      "ch": "無法同步裝備狀態",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_TransferContent",
+      "en": "Could not transfer container contents",
+      "cn": "无法转移容器内容",
+      "ch": "無法轉移容器內容",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_UnknownUpgrade",
+      "en": "Unknown upgrade",
+      "cn": "未知改装",
+      "ch": "未知改裝",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_WrongEquipment",
+      "en": "This upgrade does not fit that equipment",
+      "cn": "此改装不适用于该装备",
+      "ch": "此改裝不適用於該裝備",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_WrongSlotGroup",
+      "en": "This slot does not belong to that equipment",
+      "cn": "该槽位不属于此装备",
+      "ch": "該欄位不屬於此裝備",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_BeltPouch1",
+      "en": "Left Belt Pouch",
+      "cn": "腰带左袋",
+      "ch": "腰帶左袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_BeltPouch2",
+      "en": "Right Belt Pouch",
+      "cn": "腰带右袋",
+      "ch": "腰帶右袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_BeltPouch3",
+      "en": "Legacy Third Pouch",
+      "cn": "旧版第三口袋",
+      "ch": "舊版第三口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_BulletSlot",
+      "en": "Tactical Bullet Bandolier",
+      "cn": "战术子弹槽",
+      "ch": "戰術子彈槽",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_KeyClip",
+      "en": "Key Clip",
+      "cn": "钥匙扣",
+      "ch": "鑰匙扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_MagPanel",
+      "en": "Tactical Magazine Panel",
+      "cn": "战术弹匣面板",
+      "ch": "戰術彈匣面板",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_PackMedBox",
+      "en": "Pack First Aid Kit",
+      "cn": "急救箱",
+      "ch": "急救箱",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_PackSideL",
+      "en": "Left Pack Side Pouch",
+      "cn": "左侧口袋",
+      "ch": "左側口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_PackSideR",
+      "en": "Right Pack Side Pouch",
+      "cn": "右侧口袋",
+      "ch": "右側口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_PackToolbox",
+      "en": "Pack Toolbox",
+      "cn": "军包工具箱",
+      "ch": "軍包工具箱",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_PackTopPouch",
+      "en": "Pack Top Pouch",
+      "cn": "上盖口袋",
+      "ch": "上蓋口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_RigPouchL",
+      "en": "Bullet Pouch",
+      "cn": "子弹口袋",
+      "ch": "子彈口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_RigPouchR",
+      "en": "Shell Pouch",
+      "cn": "霰弹口袋",
+      "ch": "霰彈口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ShellSlot",
+      "en": "Tactical Shell Bandolier",
+      "cn": "战术霰弹槽",
+      "ch": "戰術霰彈槽",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ShoulderPouchL",
+      "en": "Left Shoulder Holster Pouch",
+      "cn": "左肩枪套袋",
+      "ch": "左肩槍套袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ShoulderPouchR",
+      "en": "Right Shoulder Holster Pouch",
+      "cn": "右肩枪套袋",
+      "ch": "右肩槍套袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_TacticalBelt",
+      "en": "Mercenary Tactical Belt",
+      "cn": "雇佣兵战术腰带",
+      "ch": "傭兵戰術腰帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_TacticalPack",
+      "en": "Mercenary Tactical Pack",
+      "cn": "雇佣兵战术背包",
+      "ch": "傭兵戰術背包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_TacticalRig",
+      "en": "Mercenary Tactical Rig",
+      "cn": "雇佣兵战术背带",
+      "ch": "傭兵戰術背帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ThighGuardL",
+      "en": "Mercenary Tactical Left Thigh Guard",
+      "cn": "雇佣兵战术左护腿",
+      "ch": "傭兵戰術左護腿",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ThighGuardR",
+      "en": "Mercenary Tactical Right Thigh Guard",
+      "cn": "雇佣兵战术右护腿",
+      "ch": "傭兵戰術右護腿",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Requirement_Material",
+      "en": "Material: %1 x%2",
+      "cn": "材料：%1 x%2",
+      "ch": "材料：%1 x%2",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Requirement_Skill",
+      "en": "%1: %2",
+      "cn": "%1：%2级",
+      "ch": "%1：%2級",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Requirement_Source",
+      "en": "Part: %1",
+      "cn": "部件：%1",
+      "ch": "零件：%1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Requirement_SourceSet",
+      "en": "Part: %1",
+      "cn": "部件：%1",
+      "ch": "零件：%1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Requirement_Tool",
+      "en": "Tool: %1",
+      "cn": "工具：%1",
+      "ch": "工具：%1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_BeltHolsterL",
+      "en": "Left Waist Holster",
+      "cn": "左腰枪套",
+      "ch": "左腰槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_BeltHolsterR",
+      "en": "Right Waist Holster",
+      "cn": "右腰枪套",
+      "ch": "右腰槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_BeltToolL",
+      "en": "Left Belt Clip",
+      "cn": "腰带左挂扣",
+      "ch": "腰帶左掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_BeltToolR",
+      "en": "Right Belt Clip",
+      "cn": "腰带右挂扣",
+      "ch": "腰帶右掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackCDPlayer",
+      "en": "Electronic Device Hook",
+      "cn": "电子设备挂扣",
+      "ch": "電子設備掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackLantern",
+      "en": "Lantern Hook",
+      "cn": "提灯挂扣",
+      "ch": "提燈掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackMedBox",
+      "en": "First Aid Kit Hook",
+      "cn": "急救箱挂扣",
+      "ch": "急救箱掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackSportBottle",
+      "en": "Bottle Hook",
+      "cn": "水壶挂扣",
+      "ch": "水壺掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackToolbox",
+      "en": "Toolbox Hook",
+      "cn": "工具箱挂扣",
+      "ch": "工具箱掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackWeldingMask",
+      "en": "Mask Hook",
+      "cn": "面罩挂扣",
+      "ch": "面罩掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_RigPistolL",
+      "en": "Left Shoulder Holster",
+      "cn": "左肩枪套",
+      "ch": "左肩槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_RigPistolR",
+      "en": "Right Shoulder Holster",
+      "cn": "右肩枪套",
+      "ch": "右肩槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_RigRifleL",
+      "en": "Left Rifle Sling",
+      "cn": "左长枪肩带",
+      "ch": "左長槍肩帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_RigRifleR",
+      "en": "Right Rifle Sling",
+      "cn": "右长枪肩带",
+      "ch": "右長槍肩帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_ThighKnifeL",
+      "en": "Left Thigh Knife",
+      "cn": "左腿匕首位",
+      "ch": "左腿匕首位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_ThighKnifeR",
+      "en": "Right Thigh Knife",
+      "cn": "右腿匕首位",
+      "ch": "右腿匕首位",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_Unknown",
+      "en": "Attachment",
+      "cn": "外挂",
+      "ch": "外掛",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceSet_BULLET_STRAP",
+      "en": "Bullets Bandolier",
+      "cn": "子弹弹带",
+      "ch": "子彈彈帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceSet_FANNY",
+      "en": "empty Fanny Pack",
+      "cn": "空腰包",
+      "ch": "空腰包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceSet_FIRST_AID",
+      "en": "First Aid Kit",
+      "cn": "急救箱",
+      "ch": "急救箱",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceSet_SATCHEL",
+      "en": "empty Satchel or Sling Bag",
+      "cn": "空挎包或单肩包",
+      "ch": "空側背包或單肩包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceSet_SHELL_STRAP",
+      "en": "Shells Bandolier",
+      "cn": "霰弹弹带",
+      "ch": "霰彈彈帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_SourceSet_TOOLBOX",
+      "en": "Toolbox",
+      "cn": "工具箱",
+      "ch": "工具箱",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Status_Attached",
+      "en": "Attachment installed",
+      "cn": "外挂已安装",
+      "ch": "外掛已安裝",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Status_Detached",
+      "en": "Attachment removed",
+      "cn": "外挂已取下",
+      "ch": "外掛已取下",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Status_LanternOff",
+      "en": "Propane lantern turned off",
+      "cn": "丙烷灯已关闭",
+      "ch": "丙烷燈已關閉",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Status_LanternOn",
+      "en": "Propane lantern turned on",
+      "cn": "丙烷灯已开启",
+      "ch": "丙烷燈已開啟",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Status_UpgradeComplete",
+      "en": "%1 complete",
+      "cn": "%1完成",
+      "ch": "%1完成",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltDoubleHolster",
+      "en": "Install Double Holster",
+      "cn": "安装双枪套",
+      "ch": "安裝雙槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltKeyClip",
+      "en": "Install Key Clip",
+      "cn": "安装钥匙扣",
+      "ch": "安裝鑰匙扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltPouch1",
+      "en": "Install Left Belt Pouch",
+      "cn": "安装腰带左袋",
+      "ch": "安裝腰帶左袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltPouch2",
+      "en": "Install Right Belt Pouch",
+      "cn": "安装腰带右袋",
+      "ch": "安裝腰帶右袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltPouch3",
+      "en": "Install Legacy Third Pouch",
+      "cn": "安装旧版第三口袋",
+      "ch": "安裝舊版第三口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltToolL",
+      "en": "Install Left Belt Clip",
+      "cn": "安装腰带左挂扣",
+      "ch": "安裝腰帶左掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_BeltToolR",
+      "en": "Install Right Belt Clip",
+      "cn": "安装腰带右挂扣",
+      "ch": "安裝腰帶右掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackCDPlayer",
+      "en": "Install Electronic Device Hook",
+      "cn": "安装电子设备挂扣",
+      "ch": "安裝電子設備掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackLantern",
+      "en": "Install Lantern Hook",
+      "cn": "安装提灯挂扣",
+      "ch": "安裝提燈掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackMedBox",
+      "en": "Install First Aid Kit Hook",
+      "cn": "安装急救箱挂扣",
+      "ch": "安裝急救箱掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackSidePouchL",
+      "en": "Install Left Side Pouch",
+      "cn": "安装左侧口袋",
+      "ch": "安裝左側口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackSidePouchR",
+      "en": "Install Right Side Pouch",
+      "cn": "安装右侧口袋",
+      "ch": "安裝右側口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackSportBottle",
+      "en": "Install Bottle Hook",
+      "cn": "安装水壶挂扣",
+      "ch": "安裝水壺掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackToolbox",
+      "en": "Install Toolbox Hook",
+      "cn": "安装工具箱挂扣",
+      "ch": "安裝工具箱掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackTopPouch",
+      "en": "Install Top Pouch",
+      "cn": "安装上盖口袋",
+      "ch": "安裝上蓋口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackWeldingMask",
+      "en": "Install Mask Hook",
+      "cn": "安装面罩挂扣",
+      "ch": "安裝面罩掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigBullets",
+      "en": "Install Bullet Bandolier",
+      "cn": "安装子弹槽",
+      "ch": "安裝子彈槽",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigMagPanel",
+      "en": "Install Magazine Panel",
+      "cn": "安装弹匣面板",
+      "ch": "安裝彈匣面板",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigPouchL",
+      "en": "Install Bullet Pouch",
+      "cn": "安装子弹口袋",
+      "ch": "安裝子彈口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigPouchR",
+      "en": "Install Shell Pouch",
+      "cn": "安装霰弹口袋",
+      "ch": "安裝霰彈口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigRifleL",
+      "en": "Install Left Rifle Sling",
+      "cn": "安装左长枪肩带",
+      "ch": "安裝左長槍肩帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigRifleR",
+      "en": "Install Right Rifle Sling",
+      "cn": "安装右长枪肩带",
+      "ch": "安裝右長槍肩帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigShells",
+      "en": "Install Shell Bandolier",
+      "cn": "安装霰弹槽",
+      "ch": "安裝霰彈槽",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigShoulderL",
+      "en": "Install Left Shoulder Holster",
+      "cn": "安装左肩枪套",
+      "ch": "安裝左肩槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_RigShoulderR",
+      "en": "Install Right Shoulder Holster",
+      "cn": "安装右肩枪套",
+      "ch": "安裝右肩槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighL",
+      "en": "Upgrade to Mercenary Tactical Left Thigh Guard",
+      "cn": "升级为雇佣兵战术左护腿",
+      "ch": "升級為傭兵戰術左護腿",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighR",
+      "en": "Upgrade to Mercenary Tactical Right Thigh Guard",
+      "cn": "升级为雇佣兵战术右护腿",
+      "ch": "升級為傭兵戰術右護腿",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_BulletPouch",
+      "en": "Bullet Pouch",
+      "cn": "子弹口袋",
+      "ch": "子彈口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_KeyClip",
+      "en": "Belt Key Clip",
+      "cn": "腰带钥匙扣",
+      "ch": "腰帶鑰匙扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_FirstAidModule",
+      "en": "First Aid Kit",
+      "cn": "急救箱",
+      "ch": "急救箱",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_MagPanel",
+      "en": "Tactical Magazine Panel",
+      "cn": "战术弹匣面板",
+      "ch": "戰術彈匣面板",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_PackSidePouchL",
+      "en": "Left Side Pouch",
+      "cn": "左侧口袋",
+      "ch": "左側口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_PackSidePouchR",
+      "en": "Right Side Pouch",
+      "cn": "右侧口袋",
+      "ch": "右側口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_PackTopPouch",
+      "en": "Top Pouch",
+      "cn": "上盖口袋",
+      "ch": "上蓋口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_Pouch2",
+      "en": "Convenience Pouch",
+      "cn": "便利袋",
+      "ch": "便利袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_Pouch3",
+      "en": "Legacy Third Pouch",
+      "cn": "旧版第三口袋",
+      "ch": "舊版第三口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_ShellPouch",
+      "en": "Shell Pouch",
+      "cn": "霰弹口袋",
+      "ch": "霰彈口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_SidePouch",
+      "en": "Tactical Side Pouch",
+      "cn": "战术袋",
+      "ch": "戰術袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "MercenaryLoadout.MLO_ToolboxModule",
+      "en": "Toolbox",
+      "cn": "工具箱",
+      "ch": "工具箱",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ArmGuardL",
+      "en": "Mercenary Tactical Left Bracer",
+      "cn": "雇佣兵战术左护臂",
+      "ch": "傭兵戰術左護臂",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_GreaveGuardL",
+      "en": "Mercenary Tactical Left Greave",
+      "cn": "雇佣兵战术左护胫",
+      "ch": "傭兵戰術左護脛",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ArmPouchL",
+      "en": "Bracer Pocket",
+      "cn": "护臂口袋",
+      "ch": "護臂口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ArmPouchL",
+      "en": "Install Bracer Pocket",
+      "cn": "安装护臂口袋",
+      "ch": "安裝護臂口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ThighPouchL1",
+      "en": "Thigh Front Pocket",
+      "cn": "护腿前袋",
+      "ch": "護腿前袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighPouchL1",
+      "en": "Install Thigh Front Pocket",
+      "cn": "安装护腿前袋",
+      "ch": "安裝護腿前袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ThighPouchL2",
+      "en": "Thigh Rear Pocket",
+      "cn": "护腿后袋",
+      "ch": "護腿後袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighPouchL2",
+      "en": "Install Thigh Rear Pocket",
+      "cn": "安装护腿后袋",
+      "ch": "安裝護腿後袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_ThighPistolL",
+      "en": "Thigh Holster",
+      "cn": "护腿枪套",
+      "ch": "護腿槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighPistolL",
+      "en": "Install Thigh Holster",
+      "cn": "安装护腿枪套",
+      "ch": "安裝護腿槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Thigh_PistolL",
+      "en": "Thigh Holster",
+      "cn": "护腿枪套",
+      "ch": "護腿槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_GreaveKnifeL",
+      "en": "Greave Sheath",
+      "cn": "护胫刀鞘",
+      "ch": "護脛刀鞘",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_GreaveKnifeL",
+      "en": "Install Greave Sheath",
+      "cn": "安装护胫刀鞘",
+      "ch": "安裝護脛刀鞘",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Greave_KnifeL",
+      "en": "Greave Sheath",
+      "cn": "护胫刀鞘",
+      "ch": "護脛刀鞘",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ArmGuardR",
+      "en": "Mercenary Tactical Right Bracer",
+      "cn": "雇佣兵战术右护臂",
+      "ch": "傭兵戰術右護臂",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_GreaveGuardR",
+      "en": "Mercenary Tactical Right Greave",
+      "cn": "雇佣兵战术右护胫",
+      "ch": "傭兵戰術右護脛",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ArmPouchR",
+      "en": "Bracer Pocket",
+      "cn": "护臂口袋",
+      "ch": "護臂口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ArmPouchR",
+      "en": "Install Bracer Pocket",
+      "cn": "安装护臂口袋",
+      "ch": "安裝護臂口袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ThighPouchR1",
+      "en": "Thigh Front Pocket",
+      "cn": "护腿前袋",
+      "ch": "護腿前袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighPouchR1",
+      "en": "Install Thigh Front Pocket",
+      "cn": "安装护腿前袋",
+      "ch": "安裝護腿前袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Name_ThighPouchR2",
+      "en": "Thigh Rear Pocket",
+      "cn": "护腿后袋",
+      "ch": "護腿後袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighPouchR2",
+      "en": "Install Thigh Rear Pocket",
+      "cn": "安装护腿后袋",
+      "ch": "安裝護腿後袋",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_ThighPistolR",
+      "en": "Thigh Holster",
+      "cn": "护腿枪套",
+      "ch": "護腿槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_ThighPistolR",
+      "en": "Install Thigh Holster",
+      "cn": "安装护腿枪套",
+      "ch": "安裝護腿槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Thigh_PistolR",
+      "en": "Thigh Holster",
+      "cn": "护腿枪套",
+      "ch": "護腿槍套",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_GreaveKnifeR",
+      "en": "Greave Sheath",
+      "cn": "护胫刀鞘",
+      "ch": "護脛刀鞘",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_GreaveKnifeR",
+      "en": "Install Greave Sheath",
+      "cn": "安装护胫刀鞘",
+      "ch": "安裝護脛刀鞘",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Greave_KnifeR",
+      "en": "Greave Sheath",
+      "cn": "护胫刀鞘",
+      "ch": "護脛刀鞘",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout",
+      "en": "Mercenary Loadout",
+      "cn": "雇佣兵装备",
+      "ch": "傭兵裝備",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Backpack",
+      "en": "Enable Mercenary Tactical Pack",
+      "cn": "启用雇佣兵战术背包",
+      "ch": "啟用傭兵戰術背包",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Backpack_tooltip",
+      "en": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+      "cn": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+      "ch": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_ALICE",
+      "en": "Enable Mercenary Tactical Rig",
+      "cn": "启用雇佣兵战术背带",
+      "ch": "啟用傭兵戰術背帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_ALICE_tooltip",
+      "en": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+      "cn": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+      "ch": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Belt",
+      "en": "Enable Mercenary Tactical Belt",
+      "cn": "启用雇佣兵战术皮带",
+      "ch": "啟用傭兵戰術皮帶",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Belt_tooltip",
+      "en": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+      "cn": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+      "ch": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Arm",
+      "en": "Enable Mercenary Tactical Vambraces",
+      "cn": "启用雇佣兵战术护臂",
+      "ch": "啟用傭兵戰術護臂",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Arm_tooltip",
+      "en": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+      "cn": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+      "ch": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Thigh",
+      "en": "Enable Mercenary Tactical Thigh Guards",
+      "cn": "启用雇佣兵战术护腿",
+      "ch": "啟用傭兵戰術護腿",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Thigh_tooltip",
+      "en": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+      "cn": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+      "ch": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Greave",
+      "en": "Enable Mercenary Tactical Greaves",
+      "cn": "启用雇佣兵战术护胫",
+      "ch": "啟用傭兵戰術護脛",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_Greave_tooltip",
+      "en": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+      "cn": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+      "ch": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "IGUI_HotbarAttachment_MLO_Pack_PlushToy",
+      "en": "Plush Toy Hook",
+      "cn": "玩偶挂扣",
+      "ch": "玩偶掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Slot_PackPlushToy",
+      "en": "Plush Toy Hook",
+      "cn": "玩偶挂扣",
+      "ch": "玩偶掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Upgrade_PackPlushToy",
+      "en": "Install Plush Toy Hook",
+      "cn": "安装玩偶挂扣",
+      "ch": "安裝玩偶掛扣",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    }
+  ]
+}

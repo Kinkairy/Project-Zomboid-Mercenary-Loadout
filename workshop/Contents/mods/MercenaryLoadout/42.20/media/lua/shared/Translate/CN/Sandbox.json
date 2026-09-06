@@ -1,0 +1,15 @@
+{
+  "Sandbox_MercenaryLoadout": "雇佣兵装备",
+  "Sandbox_MercenaryLoadout_Backpack": "启用雇佣兵战术背包",
+  "Sandbox_MercenaryLoadout_Backpack_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+  "Sandbox_MercenaryLoadout_ALICE": "启用雇佣兵战术背带",
+  "Sandbox_MercenaryLoadout_ALICE_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+  "Sandbox_MercenaryLoadout_Belt": "启用雇佣兵战术皮带",
+  "Sandbox_MercenaryLoadout_Belt_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+  "Sandbox_MercenaryLoadout_Arm": "启用雇佣兵战术护臂",
+  "Sandbox_MercenaryLoadout_Arm_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+  "Sandbox_MercenaryLoadout_Thigh": "启用雇佣兵战术护腿",
+  "Sandbox_MercenaryLoadout_Thigh_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+  "Sandbox_MercenaryLoadout_Greave": "启用雇佣兵战术护胫",
+  "Sandbox_MercenaryLoadout_Greave_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。"
+}
