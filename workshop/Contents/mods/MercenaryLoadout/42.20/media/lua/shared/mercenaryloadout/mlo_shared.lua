@@ -18,9 +18,6 @@ M.TYPE = {
     },
 
     PACK = {
-        ["Base.Bag_BigHikingBag"] = true,
-        ["Base.Bag_BigHikingBag_Travel"] = true,
-        ["Base.Bag_Military"] = true,
         ["Base.Bag_SurvivorBag"] = true,
         ["Base.Bag_ALICEpack"] = true,
         ["Base.Bag_ALICEpack_Army"] = true,

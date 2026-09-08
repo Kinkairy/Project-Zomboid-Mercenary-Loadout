@@ -2,6 +2,8 @@
 
 ## 1.3.2
 
+1.3.2：改善性能。 / Improved performance.
+
 1.3.2：修复轮盘多灯显示、挂载设备播放和口袋负重，完善钥匙识别与容器取用。 / Fixed multiple light entries, mounted-device playback and pocket weight; improved key recognition and container access.
 
 - 修复地面或其他容器转入挂载工具箱/急救箱时显示错误，以及“移动到”目标缺失。

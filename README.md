@@ -12,7 +12,7 @@
 
 ## 用哪些装备升级？
 
-背包：大登山包（含旅行款）、军用行李袋、大型背包、军用背包（含军绿、沙漠迷彩与生存者款）。背带：爱丽丝背带普通、绿色、迷彩款。皮带：原版皮带。护臂、护腿、护胫：仅支持**军用防弹款**，左右均可升级。
+背包：大型背包、军用背包。背带：爱丽丝背带普通、绿色和迷彩款。皮带：原版皮带。护臂、护腿、护胫：仅支持**军用防弹款**，左右均可改装。
 
 ## 六类战术装备
 
@@ -82,7 +82,7 @@ The extra pouches and compartments help **organize supplies by category**, keepi
 
 ## Which items can be upgraded?
 
-Big Hiking Backpacks (including travel variants), the supported military Duffel Bag, Military/Large Backpacks (including army, desert-camo and survivor variants); standard/green/camo ALICE Belt and Suspenders; the vanilla Belt; and **military bulletproof forearm, thigh and shin armor**, both sides.
+Large and Military Backpacks; standard, green and camo ALICE Belt and Suspenders; the vanilla Belt; and **military bulletproof forearm, thigh and shin armor**, both sides.
 
 ## Six Gear Components
 
