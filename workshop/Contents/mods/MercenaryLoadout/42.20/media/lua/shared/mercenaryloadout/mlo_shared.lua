@@ -604,6 +604,7 @@ M.MODULE_SLOT = {
 }
 
 M.MODULE_BODY_LOCATION = {
+    beltKeyClip = MercenaryLoadoutRegistry.ItemBodyLocation.KeyClip,
     beltPouch1 = MercenaryLoadoutRegistry.ItemBodyLocation.BeltPouch1,
     beltPouch2 = MercenaryLoadoutRegistry.ItemBodyLocation.BeltPouch2,
     beltPouch3 = MercenaryLoadoutRegistry.ItemBodyLocation.BeltPouch3,
@@ -844,6 +845,7 @@ for _, equipment in ipairs(M.ARMOR_EQUIPMENT) do
             fullType=M.FIXED_POUCH.packTopPouch.fullType, capacity=M.FIXED_POUCH.packTopPouch.capacity,
         }
         M.MODULE_NAME_KEY[moduleKey] = "IGUI_MLO_Name_" .. label
+        M.MODULE_BODY_LOCATION[moduleKey] = MercenaryLoadoutRegistry.ItemBodyLocation[label]
     end
     local mount = equipment.mount
     if mount then
@@ -1036,12 +1038,16 @@ M.CONTAINER_REPAIR_SCHEMA = 3
 -- A factory item is a read-only template, never a replacement for the saved
 -- item.  The repair below only copies scalar vanilla fields to the existing
 -- object and its existing ItemContainer, preserving item ID and all contents.
+-- instanceItem is the native Lua factory in this game version.
+local function vanillaContainerTemplate(fullType)
+    if not instanceItem then return nil end
+    return safeCall(function() return instanceItem(fullType) end, nil)
+end
+
 local function pristineVanillaContainerState(item)
     local fullType=M.fullType(item)
     local fallback=M.VANILLA_CONTAINER_STATE[fullType]
-    local template=safeCall(function()
-        return InventoryItemFactory and InventoryItemFactory.CreateItem(fullType) or nil
-    end,nil)
+    local template=vanillaContainerTemplate(fullType)
     local templateInventory=template and safeCall(function() return template:getInventory() end,nil) or nil
     if templateInventory and safeCall(function() return template:IsInventoryContainer() end,false)
         and safeCall(function() return templateInventory:getContainingItem() end,nil)==template then
@@ -2537,6 +2543,51 @@ function M.consumeMaterialPlan(tx, plan)
     return true, nil
 end
 
+-- Scale the native remaining burden; mounted ordinary items retain native weight.
+-- Pouches use the military pack; the key clip retains the key-ring baseline.
+function M.pouchReductionEffect()
+    local value = tonumber(SandboxVars and SandboxVars.MercenaryLoadout
+        and SandboxVars.MercenaryLoadout.PouchReductionEffect)
+    -- Native enum values are one-based; missing/invalid values use Original.
+    return ({100, 75, 50, 25, 10, 5})[value or 1] or 100
+end
+
+local fixedPouchBaseReductions = {}
+function M.fixedPouchBaseWeightReduction(moduleKey)
+    local fullType = moduleKey == "beltKeyClip" and "Base.KeyRing" or "Base.Bag_ALICEpack_Army"
+    local original = fixedPouchBaseReductions[fullType]
+    if original == nil then
+        -- Script Item has no getWeightReduction method. Read a real vanilla
+        -- template once per category; never add it to an inventory or publish it.
+        local template = vanillaContainerTemplate(fullType)
+        original = template and safeCall(function() return tonumber(template:getWeightReduction()) end, nil)
+        if not original or original ~= original then
+            M.logOnce("pouch-baseline:" .. fullType, "vanilla reduction template unavailable; using 85: " .. fullType)
+            original = 85
+        end
+        fixedPouchBaseReductions[fullType] = original
+    end
+    original = math.max(0, math.min(100, original))
+    return original
+end
+
+function M.scaledContainerReduction(original)
+    -- Native integer rounding is unavoidable; never multiply a previous result.
+    return math.floor(100 - (100 - original) * M.pouchReductionEffect() / 100 + 0.5)
+end
+
+function M.fixedPouchWeightReduction(moduleKey)
+    return M.scaledContainerReduction(M.fixedPouchBaseWeightReduction(moduleKey))
+end
+
+local previousPouchReductionEffect
+function M.takePouchReductionChange()
+    local current = M.pouchReductionEffect()
+    local changed = previousPouchReductionEffect ~= current
+    previousPouchReductionEffect = current
+    return changed
+end
+
 function M.sourceWeightReduction(source, fallback)
     if not source then return fallback end
     local wr = safeCall(function() return source:getWeightReduction() end, nil)
@@ -2931,6 +2982,198 @@ local function ensureAttachmentsProvidedTx(tx, parent)
     return true, nil
 end
 
+-- Discover once from authoritative parent IDs. Child ModData may arrive later;
+-- conflicting claims must never equip another parent's storage.
+function M.fixedPouchBindings(player, snapshot)
+    snapshot = snapshot or M.inventorySnapshot(player)
+    local bindings, idCounts = {}, {}
+    for _, item in ipairs(snapshot.items) do
+        local id = safeCall(function() return tonumber(item:getID()) end, nil)
+        if id then idCounts[id] = (idCounts[id] or 0) + 1 end
+    end
+    for _, parent in ipairs(snapshot.parents or snapshot.items) do
+        if M.isParent(parent) and idCounts[tonumber(parent:getID())] == 1 then
+            for moduleKey in pairs(M.FIXED_POUCH) do
+                local item = M.fixedModuleContainerForParent(player, parent, moduleKey, snapshot)
+                if item then
+                    if idCounts[tonumber(item:getID())] ~= 1 or bindings[item] ~= nil then bindings[item] = false
+                    else bindings[item] = {parent=parent, moduleKey=moduleKey} end
+                end
+            end
+        end
+    end
+    return bindings
+end
+
+-- A persistent per-instance baseline survives saves and client/server refreshes.
+-- Only MLO-upgraded parents and authoritatively linked pouches enter this path.
+function M.applyTacticalBurden(item, enabled, originalReduction)
+    local ok = pcall(function()
+        local md = item:getModData()
+        local base = md.MLO_burdenBase
+        if not enabled and not base then return end
+        if not base then
+            base = {actual=item:getActualWeightUnmodded(), weight=item:getWeight(),
+                custom=item:isCustomWeight()}
+            if item:IsInventoryContainer() then
+                base.reduction = originalReduction or item:getWeightReduction()
+            end
+            md.MLO_burdenBase = base
+        end
+        local factor = enabled and M.pouchReductionEffect() / 100 or 1
+        local actual, weight = base.actual * factor, base.weight * factor
+        if math.abs(item:getActualWeightUnmodded() - actual) > 0.000001 then item:setActualWeight(actual) end
+        if math.abs(item:getWeight() - weight) > 0.000001 then item:setWeight(weight) end
+        local custom = factor ~= 1 or base.custom == true
+        if item:isCustomWeight() ~= custom then item:setCustomWeight(custom) end
+        if base.reduction ~= nil then
+            local reduction = enabled and M.scaledContainerReduction(base.reduction) or base.reduction
+            if item:getWeightReduction() ~= reduction then item:setWeightReduction(reduction) end
+            local inventory = item:getInventory()
+            if inventory:getWeightReduction() ~= reduction then inventory:setWeightReduction(reduction) end
+        end
+        if not enabled then md.MLO_burdenBase = nil end
+    end)
+    if not ok then M.logOnce("tactical-burden:" .. itemId(item), "tactical burden update failed") end
+    return ok
+end
+
+local function isUpgradedTacticalParent(item)
+    local group = M.groupOf(item)
+    if not group then return false end
+    local md = item:getModData()
+    for _, key in ipairs(M.UPGRADE_ORDER[group] or {}) do
+        if md["MLO_up_" .. key] == true then return true end
+    end
+    return false
+end
+
+function M.syncFixedPouchWeights(player, snapshot, bindings)
+    if not player then return false end
+    snapshot = snapshot or M.inventorySnapshot(player)
+    bindings = bindings or M.fixedPouchBindings(player, snapshot)
+    local ok = true
+    for _, item in ipairs(snapshot.items) do
+        local binding = bindings[item]
+        if binding then
+            if not M.applyTacticalBurden(item, true, M.fixedPouchBaseWeightReduction(binding.moduleKey)) then ok = false end
+        elseif bindings[item] == nil then
+            -- Also restore previously scaled equipment after reset/unlink.
+            local enabled = isUpgradedTacticalParent(item)
+            if enabled or item:getModData().MLO_burdenBase then
+                if not M.applyTacticalBurden(item, enabled) then ok = false end
+            end
+        end
+    end
+    return ok
+end
+
+local pendingPouchVisuals = {}
+function M.clearPouchPlayerState(player)
+    pendingPouchVisuals[player] = nil
+end
+
+-- Only the owning client/SP projects equipment, after native item delivery.
+-- A server-side pre-publication wear could send SyncClothing before AddItem.
+-- No fake EquipParent and no changes to item IDs or contents.
+function M.syncFixedPouchEquipment(player, snapshot)
+    if not player then return false end
+    if type(isServer) == "function" and isServer() then return true end
+    if type(isClient) == "function" and isClient()
+        and not safeCall(function() return player:isLocalPlayer() end, false) then return true end
+    snapshot = snapshot or M.inventorySnapshot(player)
+    local bindings = M.fixedPouchBindings(player, snapshot)
+    local desired, blocked, waiting = {}, {}, {}
+    local ok = M.syncFixedPouchWeights(player, snapshot, bindings)
+    M.registerBodyLocations()
+    for item, binding in pairs(bindings) do
+        -- Native key rings use isFakeEquipped; only sewn pockets need wear slots.
+        if binding and binding.moduleKey ~= "beltKeyClip"
+            and itemContainer(item) == player:getInventory()
+            and M.parentEquipped(player, binding.parent) then
+            local location = M.MODULE_BODY_LOCATION[binding.moduleKey]
+            if location then
+                if desired[location] then blocked[location] = true end
+                desired[location] = item
+            end
+        end
+    end
+    for location in pairs(blocked) do desired[location] = nil end
+    if not ok then desired = {} end
+    -- Every setWornItem serializes the full clothing list. If a saved pouch
+    -- asset is still loading, wait before sending ANY clothing packet.
+    for _, location in pairs(M.MODULE_BODY_LOCATION) do
+        local current = safeCall(function() return player:getWornItem(location) end, nil)
+        if current and M.isFixedPouchItem(current)
+            and not safeCall(function() return current:getVisual() end, nil) then
+            waiting[#waiting+1] = current
+        end
+    end
+    if #waiting > 0 then
+        pendingPouchVisuals[player] = {items=waiting, ticks=1200}
+        return false
+    end
+    -- Clear all obsolete slots before activating any replacement or swapped side.
+    for _, location in pairs(M.MODULE_BODY_LOCATION) do
+        local current = safeCall(function() return player:getWornItem(location) end, nil)
+        if current and current ~= desired[location] then
+            if M.isModuleItem(current) then
+                local cleared = pcall(function() player:removeWornItem(current, false) end)
+                if not cleared or safeCall(function() return player:getWornItem(location) end, current) == current then
+                    ok = false blocked[location] = true
+                end
+            else
+                blocked[location] = true
+            end
+        end
+    end
+    for location, item in pairs(desired) do
+        if not blocked[location] then
+            local visual = safeCall(function() return item:getVisual() end, nil)
+            if not visual then
+                waiting[#waiting+1] = item
+                ok = false
+                -- Never serialize a worn container without a ready ItemVisual.
+                if safeCall(function() return player:getWornItem(location) end, nil) == item then
+                    pcall(function() player:removeWornItem(item, false) end)
+                end
+            else
+                local equipped = pcall(function()
+                    if item:canBeEquipped() ~= location then item:setCanBeEquipped(location) end
+                    if player:getWornItem(location) ~= item then player:setWornItem(location, item, false) end
+                end)
+                if not equipped or safeCall(function() return player:getWornItem(location) end, nil) ~= item then
+                    ok = false
+                    M.logOnce("pouch-equip:" .. itemId(item), "native fixed-pouch equip failed")
+                end
+            end
+        end
+    end
+    pendingPouchVisuals[player] = #waiting > 0 and {items=waiting, ticks=1200} or nil
+    return ok
+end
+
+-- Asset loading may finish after the first projection. Poll only these exact
+-- pending items, ten ticks apart, for a bounded time; never rescan inventory.
+function M.pouchVisualBecameReady(player)
+    local pending = pendingPouchVisuals[player]
+    if not pending then return false end
+    pending.ticks = pending.ticks - 1
+    if pending.ticks <= 0 then
+        pendingPouchVisuals[player] = nil
+        M.logOnce("pouch-visual-timeout:" .. itemId(player), "fixed-pouch clothing asset did not become ready")
+        return false
+    end
+    if pending.ticks % 10 ~= 0 then return false end
+    for _, item in ipairs(pending.items) do
+        if safeCall(function() return item:getVisual() end, nil) then
+            pendingPouchVisuals[player] = nil
+            return true
+        end
+    end
+    return false
+end
+
 local function setEquipParentTx(tx, item, expected)
     local previous = safeCall(function() return item:getEquipParent() end, nil)
     M.addUndo(tx, function()
@@ -2955,13 +3198,12 @@ local function setModuleWornTx(tx, player, item, moduleKey, worn)
         return true, nil
     end
 
-    -- Build 42's clothing packet assumes every worn item has ItemVisual. Hidden
-    -- InventoryContainer modules do not, so treating them as clothing causes a
-    -- SyncClothing null dereference. Fixed pouches are activated by their
-    -- authoritative parent link and the inventory-sidebar extension instead.
-    -- This path now exists only to clean dev.5 worn-module state transactionally.
+    -- Transactional cleanup only. Native activation runs after the real child
+    -- arrives at its owning client/SP and its ClothingItem visual is ready.
+    -- Never send SyncClothing for a not-yet-published newly created container.
     local previous = safeCall(function() return player:getWornItem(location) end, nil)
     if previous ~= item then return true, nil end
+    if worn and safeCall(function() return item:getVisual() end, nil) then return true, nil end
     M.addUndo(tx, function()
         local restored = pcall(function() player:setWornItem(location, item) end)
         return restored and safeCall(function() return player:getWornItem(location) end, nil) == item
@@ -3488,7 +3730,7 @@ function M.migrateLegacyContainerModules(player)
             if not unlinked then return M.abortTransaction(tx, unlinkReason), changedParents, unlinkReason end
             local replacement, createReason = M.createModuleTx(
                 tx, player, parent, fixedPouch.fullType, moduleKey,
-                M.MODULE_NAME_KEY[moduleKey], M.sourceWeightReduction(item, 65), fixedPouch.capacity
+                M.MODULE_NAME_KEY[moduleKey], M.fixedPouchWeightReduction(moduleKey), fixedPouch.capacity
             )
             if not replacement then return M.abortTransaction(tx, createReason), changedParents, createReason end
             local transferred, transferReason = M.transferContentsTx(tx, item, replacement)
@@ -3600,7 +3842,9 @@ function M.syncInstalledModules(player, refreshPresentation, snapshot, migrateLe
             local cleared = pcall(function()
                 if location then
                     local current = player:getWornItem(location)
-                    if current == item then player:removeWornItem(item, false) end
+                    if current == item and not safeCall(function() return item:getVisual() end, nil) then
+                        player:removeWornItem(item, false)
+                    end
                 elseif item:getEquipParent() ~= nil then
                     item:setEquipParent(nil)
                 end
@@ -3611,6 +3855,11 @@ function M.syncInstalledModules(player, refreshPresentation, snapshot, migrateLe
                     "legacy worn-module cleanup failed for module " .. itemId(item))
             end
         end
+    end
+    if refreshPresentation then
+        if not M.syncFixedPouchEquipment(player, snapshot) then ok = false end
+    elseif not M.syncFixedPouchWeights(player, snapshot) then
+        ok = false
     end
     return ok
 end
@@ -3648,7 +3897,7 @@ local function installFixedPouchTx(tx, player, parent, source, moduleKey, name, 
     if not fixed then return false, M.message("IGUI_MLO_Error_InvalidModule") end
     local module, createReason = M.createModuleTx(
         tx, player, parent, fixed.fullType, moduleKey, name,
-        M.sourceWeightReduction(source, 65), fixed.capacity
+        M.fixedPouchWeightReduction(moduleKey), fixed.capacity
     )
     if not module then return false, createReason end
     if fixed.preserveContents then
@@ -4207,7 +4456,9 @@ function M.resetComponentParent(player, parent, snapshot)
         if not ok then error(M.localize(reason)) end
     end)
     if not staged then return M.abortTransaction(tx, tostring(failure)) end
-    return commitComponentReset(tx)
+    local committed, reason = commitComponentReset(tx)
+    if committed then M.syncFixedPouchWeights(player) end
+    return committed, reason
 end
 
 local function parentHasComponentState(parent)

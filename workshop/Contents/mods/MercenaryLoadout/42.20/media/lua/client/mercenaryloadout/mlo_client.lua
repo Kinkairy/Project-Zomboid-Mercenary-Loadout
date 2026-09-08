@@ -11,12 +11,14 @@ require "Hotbar/ISHotbar"
 require "ISUI/ISInventoryPage"
 require "ISUI/ISInventoryPane"
 require "ISUI/ISInventoryPaneContextMenu"
-require "ISUI/ISRadioAndTvMenu"
-require "RadioCom/ISRadioWindow"
+require "ISUI/ISDPadWheels"
 require "TimedActions/ISWearClothing"
 require "TimedActions/ISUnequipAction"
+require "TimedActions/ISEquipWeaponAction"
+require "RadioCom/ISRadioWindow"
 require "mercenaryloadout/mlo_shared"
 require "mercenaryloadout/mlo_actions"
+require "mercenaryloadout/mlo_radio"
 
 local M = MercenaryLoadout
 
@@ -130,6 +132,7 @@ local function traceContainerTransfer(action, phase, items)
         local function location(container)
             if container == source then return "source" end
             if container == target then return "target" end
+            if container == root then return "player-root" end
             return "other"
         end
         local function state(container, item)
@@ -173,6 +176,7 @@ local function traceContainerTransfer(action, phase, items)
                 .. " actual=" .. location(item:getContainer())
                 .. " source(id/exact/dirty)=" .. state(source, item)
                 .. " target(id/exact/dirty)=" .. state(target, item)
+                .. " root(id/exact/dirty)=" .. state(root, item)
                 .. " box=" .. box:getID() .. " rootBoxSame=" .. tostring(currentBox == box)
                 .. " boxInner=" .. location(boxInventory)
                 .. " currentInnerSame=" .. tostring(currentBox and currentBox:getInventory() == boxInventory)
@@ -248,6 +252,80 @@ local function captureTransferRootExitRelations(action)
     action.MLO_rootExitRelations=hasTableEntries(relations) and relations or nil
 end
 
+-- Native attachment packets and ClientCommand share reliable ordered channel
+-- 0; inventory transactions use channel 1. Await a server acknowledgement of
+-- the exact box ownership repair before allowing the native transfer to start.
+local mountedTransferSequence=0
+local pendingMountedTransferPrepare={}
+local function clearMountedTransferPrepare(action)
+    local state=action.MLO_transportPrepare
+    if state then pendingMountedTransferPrepare[state.token]=nil end
+    action.MLO_transportPrepare=nil
+end
+local vanillaInventoryTransferForceCancel=ISInventoryTransferAction.forceCancel
+function ISInventoryTransferAction:forceCancel(...)
+    clearMountedTransferPrepare(self)
+    if vanillaInventoryTransferForceCancel then return vanillaInventoryTransferForceCancel(self,...) end
+end
+local function mountedTransferBoxes(action)
+    local boxes,seen={},{}
+    local player=action.character
+    for _,container in ipairs({action.srcContainer,action.destContainer}) do
+        local item=container and container:getContainingItem()
+        if item and M.VANILLA_CONTAINER_STATE[M.fullType(item)]
+            and item:getContainer()==player:getInventory() then
+            local parent,slot=M.findPersistentMountParent(player,item)
+            if parent and (slot==M.MODULE_SLOT.packMedBox or slot==M.MODULE_SLOT.packToolbox)
+                and item:getInventory()==container and not seen[item] then
+                boxes[#boxes+1]={item=item,inventory=container,parent=parent,slot=slot}
+                seen[item]=true
+            end
+        end
+    end
+    return boxes
+end
+local function sameMountedTransferBoxes(a,b)
+    if #a~=#b then return false end
+    for i,box in ipairs(a) do
+        local other=b[i]
+        if box.item~=other.item or box.inventory~=other.inventory
+            or box.parent~=other.parent or box.slot~=other.slot then return false end
+    end
+    return true
+end
+local vanillaInventoryTransferWaitToStart=ISInventoryTransferAction.waitToStart
+function ISInventoryTransferAction:waitToStart(...)
+    if vanillaInventoryTransferWaitToStart and vanillaInventoryTransferWaitToStart(self,...) then return true end
+    if not isClient() then return false end
+    local state=self.MLO_transportPrepare
+    local boxes=mountedTransferBoxes(self)
+    if #boxes==0 and not state then return false end
+    if not state then
+        mountedTransferSequence=mountedTransferSequence+1
+        state={token=mountedTransferSequence,boxes=boxes,startedAt=getTimestampMs()}
+        self.MLO_transportPrepare=state
+        pendingMountedTransferPrepare[state.token]=self
+        local ids={}
+        for _,box in ipairs(boxes) do ids[#ids+1]=box.item:getID() end
+        sendClientCommand(self.character,M.MODULE,"prepareMountedTransfer",{token=state.token,boxIds=ids})
+        return true
+    end
+    if state.rejected or not sameMountedTransferBoxes(state.boxes,boxes)
+        or getTimestampMs()-state.startedAt>10000 then
+        clearMountedTransferPrepare(self)
+        M.logOnce("mounted-transfer-prepare","mounted container transfer cancelled before native transaction: ownership changed or server preparation unavailable")
+        self:forceStop()
+        return true
+    end
+    if not state.ready then return true end
+    for _,box in ipairs(boxes) do
+        local ok=M.ensureMountedContainerTransport(self.character,box.item)
+        if not ok then clearMountedTransferPrepare(self);self:forceStop();return true end
+    end
+    clearMountedTransferPrepare(self)
+    return false
+end
+
 local vanillaInventoryTransferStart = ISInventoryTransferAction.start
 local vanillaInventoryTransferPerform = ISInventoryTransferAction.perform
 local vanillaInventoryTransferStop = ISInventoryTransferAction.stop
@@ -303,6 +381,7 @@ function ISInventoryTransferAction:perform()
 end
 
 function ISInventoryTransferAction:stop(...)
+    clearMountedTransferPrepare(self)
     self.MLO_rootExitRelations=nil
     return vanillaInventoryTransferStop(self,...)
 end
@@ -1227,44 +1306,39 @@ function MLOUpgradeAction:forceCancel()
 end
 end
 
+-- Both mouse/key activation and the D-pad adapter enter this same native action
+-- path. Returning a Radio uses AttachItemHotbar, not UnequipAction (which turns
+-- activated devices off). Only manual radio controls own power/media state.
+local function activatePortableRadio(hotbar, item, slotIndex, slot)
+    if not item or not instanceof(item, "Radio") or not slot or not slot.def then return false end
+    if item:getAttachedSlot() ~= slotIndex then return true end
+    local player = hotbar.chr
+    if player:getPrimaryHandItem() == item or player:getSecondaryHandItem() == item then
+        local location = item:getAttachedToModel()
+        if not location or location == "null" then return true end
+        -- Close before removing from hands, so native window.update cannot
+        -- interpret the return-to-mount action as permission to switch off.
+        local window = ISRadioWindow.instances[player:getPlayerNum()]
+        if window and window.device == item then window:close() end
+        ISTimedActionQueue.add(ISAttachItemHotbar:new(player, item, location, slotIndex, slot.def))
+    else
+        -- Native completion publishes equipment; native OnEquipSecondary opens
+        -- the actual device window, after the item has reached the hand.
+        ISInventoryPaneContextMenu.transferIfNeeded(player, item)
+        ISTimedActionQueue.add(ISEquipWeaponAction:new(player, item, 20, false, false))
+    end
+    return true
+end
+
 -- Clothing stays assigned to its Hotbar slot while vanilla Wear/Unequip owns
 -- the actual clothing state. ISHotbar:update() already hides the attached
 -- model while the item is worn and restores it when it is taken off.
-local function sameRadioItem(a,b)
-    return a and b and instanceof(a,"Radio") and instanceof(b,"Radio")
-        and tonumber(a:getID())==tonumber(b:getID())
-end
-
-local function heldRadioItem(player,item)
-    local primary,secondary=player:getPrimaryHandItem(),player:getSecondaryHandItem()
-    if sameRadioItem(primary,item) then return primary end
-    if sameRadioItem(secondary,item) then return secondary end
-    return nil
-end
-
-local function openHeldDeviceSettings(player,item)
-    -- Native transfer/equip may replace a Java object while preserving its ID.
-    -- Open only the currently held instance after the native queue has finished.
-    local held=heldRadioItem(player,item)
-    if held and held:getDeviceData() then ISRadioAndTvMenu.openRadioPanel(player,held) end
-end
-
-local function openMountedDeviceSettings(player,item)
-    if not player or not item then return end
-    if heldRadioItem(player,item) then
-        return openHeldDeviceSettings(player,item)
-    end
-    -- Native queue owns transfer, hand equip and cancellation. The settings
-    -- callback cannot open until those actions finish and the item is in hand.
-    ISInventoryPaneContextMenu.equipWeapon(item,true,false,player:getPlayerNum())
-    ISTimedActionQueue.queueActions(player,openHeldDeviceSettings,item)
-end
-
 local vanillaHotbarActivateSlot=ISHotbar.activateSlot
 function ISHotbar:activateSlot(slotIndex)
     local item=self.attachedItems and self.attachedItems[slotIndex] or nil
     local slot=self.availableSlot and self.availableSlot[slotIndex] or nil
     local slotId=slot and mloSlotIdFromDefinition(slot.def) or nil
+    if activatePortableRadio(self, item, slotIndex, slot) then return end
     if item and slotId=="MLO_Pack_WeldingMask" and M.isCompatible(slotId,item) then
         if self.chr:isEquipped(item) then
             ISTimedActionQueue.add(ISUnequipAction:new(self.chr,item,50))
@@ -1273,20 +1347,83 @@ function ISHotbar:activateSlot(slotIndex)
         end
         return
     end
-    if item and slotId=="MLO_Pack_CDPlayer" and instanceof(item,"Radio")
-        and item:getDeviceData() then
-        local instances=ISRadioWindow.instances
-        local window=instances and instances[self.chr:getPlayerNum()] or nil
-        local held=heldRadioItem(self.chr,item)
-        if window and window:getIsVisible() and window.player==self.chr and sameRadioItem(window.device,item) then
-            ISRadioWindow.closeIfActive(self.chr,held or item)
-            if held then ISTimedActionQueue.add(ISUnequipAction:new(self.chr,held,20)) end
-        else
-            openMountedDeviceSettings(self.chr,item)
-        end
-        return
-    end
     return vanillaHotbarActivateSlot(self,slotIndex)
+end
+
+-- Build 42.20.4's D-pad-left wheel has native weapon and light slices but no
+-- Radio slice. Add attached radios and route the selection through the exact
+-- Hotbar activation used by mouse and keyboard input.
+local function activateAttachedRadioFromDPad(playerIndex,itemId,slotType)
+    local player=getSpecificPlayer(playerIndex)
+    local hotbar=getPlayerHotbar(playerIndex)
+    if not player or not hotbar then return end
+    for slotIndex,slot in ipairs(hotbar.availableSlot or {}) do
+        local currentType=slot.slotType or (slot.def and slot.def.type)
+        local item=hotbar.attachedItems and hotbar.attachedItems[slotIndex] or nil
+        if currentType==slotType and item and instanceof(item,"Radio")
+            and tonumber(item:getID())==tonumber(itemId)
+            and item:getAttachedSlot()==slotIndex
+            and (player:isEquipped(item) or player:isAttachedItem(item)) then
+            -- Native radial removal is deferred by UIManager. Its callback still
+            -- sees isReallyVisible=true in this frame; exclude only this closing
+            -- wheel while retaining the stock pause/death/attack/action guards.
+            local menu = getPlayerRadialMenu(playerIndex)
+            local visible = menu:isVisible()
+            menu:setVisible(false)
+            local ok, allowed = pcall(hotbar.isAllowedToActivateSlot, hotbar)
+            menu:setVisible(visible)
+            if ok and allowed then hotbar:activateSlot(slotIndex) end
+            return
+        end
+    end
+end
+
+-- Vanilla selects one strongest light. Preserve that slice and append the
+-- other mounted lights, sharing its exact toggle/sync/sound callback.
+local function addMissingMountedLightSlices(player, hotbar, menu)
+    local shown = {}
+    for _, slice in ipairs(menu.slices or {}) do
+        local command = slice.command
+        if command and command[1] == ISDPadWheels.onToggleLight and command[2] == player then
+            shown[command[3]] = true
+        end
+    end
+    for slotIndex, item in pairs(hotbar.attachedItems or {}) do
+        if item and not shown[item] and item.canEmitLight and item:canEmitLight()
+            and not instanceof(item, "HandWeapon")
+            and item:getContainer() == player:getInventory()
+            and item:getAttachedSlot() == slotIndex
+            and (player:isEquipped(item) or player:isAttachedItem(item)) then
+            menu:addSlice(item:getDisplayName(), item:getTex(), ISDPadWheels.onToggleLight, player, item)
+            shown[item] = true
+        end
+    end
+end
+
+local vanillaDPadDisplayLeft=ISDPadWheels.onDisplayLeft
+ISDPadWheels.onDisplayLeft=function(joypadData)
+    local result=vanillaDPadDisplayLeft(joypadData)
+    local speedControls=UIManager.getSpeedControls()
+    if speedControls and speedControls:getCurrentGameSpeed()==0 then return result end
+
+    local playerIndex=joypadData.player
+    local player=getSpecificPlayer(playerIndex)
+    local hotbar=getPlayerHotbar(playerIndex)
+    local menu=getPlayerRadialMenu(playerIndex)
+    if not player or not hotbar or not menu then return result end
+    addMissingMountedLightSlices(player, hotbar, menu)
+    for slotIndex,slot in ipairs(hotbar.availableSlot or {}) do
+        local item=hotbar.attachedItems and hotbar.attachedItems[slotIndex] or nil
+        if item and instanceof(item,"Radio") and item:getAttachedSlot()==slotIndex
+            and (player:isEquipped(item) or player:isAttachedItem(item)) then
+            local slotType=slot.slotType or (slot.def and slot.def.type)
+            menu:addSlice(item:getDisplayName(),item:getTex(),activateAttachedRadioFromDPad,
+                playerIndex,tonumber(item:getID()),slotType)
+        end
+    end
+    menu:setX(getPlayerScreenLeft(playerIndex)+getPlayerScreenWidth(playerIndex)/2-menu:getWidth()/2)
+    menu:setY(getPlayerScreenTop(playerIndex)+getPlayerScreenHeight(playerIndex)/2-menu:getHeight()/2)
+    return result
 end
 
 
@@ -1863,6 +2000,7 @@ local SOURCE_SET_DISPLAY_TYPE = {
 local function sourceRequirementName(player, def, source)
     if source then return M.displayName(source) end
     if def.sourceTag then
+        if def.sourceTag == "KEY_RING" then return getItemNameFromFullType("Base.KeyRing") end
         return M.text("IGUI_MLO_SourceTag_" .. tostring(def.sourceTag))
     end
     if def.sourceSet then
@@ -2181,6 +2319,38 @@ local function addPersistentUnmountMenu(player,context,item,parent,slotId)
     end,parent,slotId)
 end
 
+-- Add validated mounted destinations to the stock menu. The native callback
+-- retains transfer queues, permission/capacity checks and multiplayer ownership.
+local function addMountedContainerMoveTargets(player,context,items)
+    local containers=activeModuleContainers(player,M.inventorySnapshot(player))
+    if #containers==0 then return end
+    local moveItems=ISInventoryPane.getActualItems(items)
+    if #moveItems==0 then return end
+    local playerIndex=player:getPlayerNum()
+    local option=context:getOptionFromName(getText("ContextMenu_Move_To"))
+    local subMenu=option and option.subOption and context:getSubMenu(option.subOption) or nil
+    local shown={}
+    for _,entry in ipairs(subMenu and subMenu.options or {}) do
+        if entry.onSelect==ISInventoryPaneContextMenu.onMoveItemsTo then
+            shown[entry.param1]=true
+        end
+    end
+    for _,item in ipairs(containers) do
+        local inventory=item:getInventory()
+        if not shown[inventory] and ISInventoryPaneContextMenu.canMoveTo(moveItems,item,playerIndex) then
+            if not subMenu then
+                option=option or context:addOption(getText("ContextMenu_Move_To"))
+                subMenu=context:getNew(context)
+                context:addSubMenu(option,subMenu)
+            end
+            local entry=subMenu:addOption(item:getName(),moveItems,
+                ISInventoryPaneContextMenu.onMoveItemsTo,inventory,playerIndex)
+            entry.notAvailable=not ISInventoryPaneContextMenu.hasRoomForAny(player,item,moveItems)
+            shown[inventory]=true
+        end
+    end
+end
+
 local function onFillInventoryObjectContextMenu(playerIndex,context,items)
     local player=getSpecificPlayer(playerIndex)
     if not player then return end
@@ -2193,6 +2363,7 @@ local function onFillInventoryObjectContextMenu(playerIndex,context,items)
             return
         end
     end
+    addMountedContainerMoveTargets(player,context,items)
     local seen={}
     local upgradeAdded=false
     for _,entry in ipairs(items) do
@@ -2211,30 +2382,23 @@ local function onFillInventoryObjectContextMenu(playerIndex,context,items)
             if mountedParent and mountedSlot then
                 addPersistentUnmountMenu(player,context,item,mountedParent,mountedSlot)
             end
-            if mountedSlot=="MLO_Pack_CDPlayer" and instanceof(item,"Radio")
-                and item:getDeviceData() then
-                local exists=false
-                for _,option in ipairs(context.options or {}) do
-                    if option.onSelect==ISRadioAndTvMenu.openRadioPanel
-                        and (option.param1==item or option.itemForTexture==item) then
-                        option.onSelect=openMountedDeviceSettings
-                        exists=true
-                        break
-                    end
-                end
-                if not exists then
-                    local option=context:addOption(getText("IGUI_DeviceOptions"),player,
-                        openMountedDeviceSettings,item)
-                    option.itemForTexture=item
-                end
-            end
         end
     end
 end
 Events.OnFillInventoryObjectContextMenu.Add(onFillInventoryObjectContextMenu)
 
+local pouchReductionEffectByPlayer = {}
 local function onPlayerUpdate(player)
+    M.tickMountedRadioPlayback(player)
     local playerNum=player and player:getPlayerNum() or nil
+    if playerNum ~= nil then
+        local effect = M.pouchReductionEffect()
+        if pouchReductionEffectByPlayer[playerNum] ~= effect then
+            pouchReductionEffectByPlayer[playerNum] = effect
+            projectionDirty[playerNum] = true
+        end
+        if M.pouchVisualBecameReady(player) then projectionDirty[playerNum] = true end
+    end
     tickPendingRootExitUnmounts(player)
     settleStateChangedProjection(player)
     if playerNum~=nil and pendingInventoryMutation[playerNum] then
@@ -2256,10 +2420,13 @@ end
 Events.OnPlayerUpdate.Add(onPlayerUpdate)
 
 local function onCreatePlayer(index,player)
+    M.clearMountedRadioPlayback(index)
     pendingMountedContainerTransferRefresh[index]=nil
     pendingInventoryMutation[index]=nil
     pendingContainerTransferTrace[index]=nil
     pendingStateSettles[index]=nil
+    pouchReductionEffectByPlayer[index]=nil
+    M.clearPouchPlayerState(player)
     M.registerAttachedLocations()
     -- PlayerID is not registered yet. Reset only local projection state here;
     -- saved-item fields are repaired after serverReady and the readiness grace.
@@ -2297,6 +2464,15 @@ end
 
 local function onServerCommand(module,command,args)
     if module~=M.MODULE or not args then return end
+    if command=="mountedTransferPrepared" then
+        local action=pendingMountedTransferPrepare[tonumber(args.token)]
+        if action and action.character:getOnlineID()==tonumber(args.playerId) then
+            local state=action.MLO_transportPrepare
+            state.ready=args.ok==true
+            state.rejected=args.ok~=true
+        end
+        return
+    end
     local player=getPlayer()
     if not player then return end
 

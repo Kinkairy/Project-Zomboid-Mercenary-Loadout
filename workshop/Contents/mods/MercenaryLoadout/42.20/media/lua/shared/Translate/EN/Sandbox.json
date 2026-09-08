@@ -11,5 +11,13 @@
   "Sandbox_MercenaryLoadout_Thigh": "Enable Mercenary Tactical Thigh Guards",
   "Sandbox_MercenaryLoadout_Thigh_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
   "Sandbox_MercenaryLoadout_Greave": "Enable Mercenary Tactical Greaves",
-  "Sandbox_MercenaryLoadout_Greave_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again."
+  "Sandbox_MercenaryLoadout_Greave_tooltip": "When disabled, items return to their vanilla state and items inside containers are not lost; after re-enabling, upgrades must be applied again.",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect": "Backpack and pocket weight multiplier",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_tooltip": "Scales the native weight of tactical equipment (including backpack and harness), their contents, installed pockets and key clips. Lower is lighter. Ordinary attached items are unchanged. Container rounding follows the game.",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option1": "Original (100%%)",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option2": "75%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option3": "50%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option4": "25%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option5": "10%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option6": "5%%"
 }

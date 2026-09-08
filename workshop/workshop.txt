@@ -1,226 +1,65 @@
 version=1
 id=3794244437
-title=雇佣兵战术套装
-description=[h1]雇佣兵战术套装[/h1]
+title=雇佣兵战术套装 / Mercenary Tactical Loadout
+description=[h1]雇佣兵战术套装 / Mercenary Tactical Loadout[/h1]
 description=
-description=[quote]将原版背包、爱丽丝背带、皮带和军用护具逐件升级，打造自己的战术携行套装。[/quote]
+description=升级原版背包、爱丽丝背带、皮带与军用护具，增加 [b]17 个挂载位、13 个独立口袋（合计容量81）和1个钥匙容器（容量10）[/b]。独立格子方便分类存放工具、医疗用品和弹药；挂载箱包另有原本的容量。
 description=
-description=[h1]全套能增加什么？[/h1]
-description=
-description=全部升级并穿齐左右护具后，共有 [b]17 个物品挂载位、13 个独立口袋和 1 个钥匙容器[/b]。口袋容量合计 81，另有容量 10 的钥匙容器；挂载的工具箱和急救箱还保留各自的容器空间。
-description=
-description=新增的独立口袋和格子用于[b]分类存放物资[/b]，方便把工具、医疗用品、弹药等分开收纳与取用。以下数量按全套升级完成计算。
-description=
-description=[h1]六类战术装备[/h1]
-description=
+description=[h2]六类装备[/h2]
 description=[list]
-description=[*][b]战术背包｜7 个挂位 + 3 个口袋[/b]：上盖口袋容量 5，左右侧袋各 15，额外口袋容量合计 35。水壶、急救箱、工具箱、面具、提灯、电子设备和玩偶各有一个独立挂位，可同时挂载。
-description=[*][b]战术背带｜2 个挂位 + 2 个口袋[/b]：爱丽丝背带增加子弹袋和霰弹袋，容量各 5，并提供对应装填加速；左右肩位各挂一把手枪，共可挂两把手枪。
-description=[*][b]战术皮带｜4 个挂位 + 2 个口袋 + 1 个钥匙容器[/b]：左右便利袋容量各 3，钥匙容器容量 10。两个枪位各自支持手枪或兼容长枪，[b]可同时挂两把长枪[/b]，也可搭配一长一短或两把手枪。另外两个通用挂环支持兼容的刀剑、锤、警棍、螺丝刀、扳手等工具或武器，以及对讲机、无绳电话。
-description=[*][b]战术护臂｜左右合计 2 个口袋[/b]：军用护臂每侧增加一个容量 5 的独立口袋，两侧合计容量 10。
-description=[*][b]战术护腿｜左右合计 2 个挂位 + 4 个口袋[/b]：军用护腿每侧增加两个容量 5 的口袋和一个手枪位；两侧合计容量 20，可挂两把手枪。
-description=[*][b]战术护胫｜左右合计 2 个挂位[/b]：军用护胫每侧增加一个刀鞘，两侧可各挂一把兼容刀具。
+description=[*][b]背包[/b]：3个口袋（5+15+15）；7个独立挂位，分别挂水壶、急救箱、工具箱、面具、提灯、电子设备和普通尺寸玩偶。
+description=[*][b]背带[/b]：子弹袋、霰弹袋各容量5，提供对应装填加速；两肩各增加1个手枪位。
+description=[*][b]皮带[/b]：左右口袋各容量3，钥匙容器容量10；两个枪位支持同时挂2把兼容长枪，也能搭配手枪；两个通用挂环支持兼容工具、近战武器、对讲机和无绳电话。
+description=[*][b]护臂[/b]：左右各1个容量5的口袋。
+description=[*][b]护腿[/b]：左右各2个容量5的口袋和1个手枪位。
+description=[*][b]护胫[/b]：左右各1个兼容刀具挂位。
 description=[/list]
 description=
-description=[h1]背包七类挂载[/h1]
+description=[h2]挂载与取用[/h2]
+description=水壶位支持兼容水瓶、水壶和烧瓶；箱包位支持普通、专业和兼容医疗包/工具箱；面具位支持防毒、呼吸器、NBC、焊工、万圣节、曲棍球及骨制面具，不含口罩、面巾和头套。提灯位支持兼容油灯、丙烷灯和自制电灯；电子位支持CD机、收音机和对讲机；玩偶挂在背包右侧。
 description=
+description=[b]背包可同时挂工具箱和急救箱，使用其中物品时不用先手动取出。[/b]原版操作会按需取用或转移；也可直接从挂载箱拖到兼容快捷槽。
+description=
+description=快捷栏与手柄轮盘可取出电子设备到副手并打开原版面板，再次操作收起面板并挂回；电源和播放由设备面板控制。挂载后可继续显示CD字幕、接收广播，效果遵循原版规则。多盏挂载灯可在轮盘分别开关。
+description=
+description=[h2]升级与设置[/h2]
 description=[list]
-description=[*][b]水壶挂位[/b]：水瓶、运动水壶、军用水壶、陶瓷水壶、牛仔水壶和烧瓶。
-description=[*][b]急救箱挂位[/b]：普通、专业急救箱，以及露营、军用急救包。
-description=[*][b]工具箱挂位[/b]：普通及各类专业工具箱、木制工具箱。
-description=[*][b]面具挂位[/b]：防毒面具、半面防毒面具、简易防毒面具、NBC 生化面罩、焊工面罩、万圣节面具、曲棍球面具和骨制面具，包含受支持的滤芯与材质变体。
-description=[*][b]提灯挂位[/b]：防风提灯及其材质变体、丙烷提灯和自制电提灯。
-description=[*][b]电子设备挂位[/b]：CD 机、收音机和对讲机。点击快捷槽自动手持并打开原版设备面板，再次点击关闭面板并收起。
-description=[*][b]玩偶挂位[/b]：背包右侧挂载受支持的普通尺寸玩偶，用于外观装饰。
+description=[*]右键兼容装备查看材料、工具和技能需求；可从可访问容器自动取出装备再升级。
+description=[*]安装钥匙容器需要3个兼容钥匙圈，三个都必须为空；容器使用原版钥匙识别逻辑。
+description=[*]独立口袋可通过容器侧栏及“移动到”使用；装备穿戴、落地或放入可访问容器时均可查看。军用护具可换左右侧并保留升级与物品。
+description=[*]六类部件分别设启用开关。关闭会拆除升级与挂件，口袋及内容保留为独立容器，材料不返还。
+description=[*]“背包口袋负重倍率”支持100%、75%、50%、25%、10%、5%，按原版计重结果缩放战术装备本身、背包/背带内容、安装口袋和钥匙容器；普通挂载物品仍按原版计算。
 description=[/list]
 description=
-description=[h1]工具箱、急救箱挂上就能用[/h1]
-description=
-description=[b]背包可以同时挂一个工具箱和一个急救箱。[/b]穿戴背包时，两者仍是可用的随身容器，保留原有内容和存取功能。使用其中的工具、医疗用品时，[b]不必先手动拖回随身物品栏[/b]：从原版支持的操作菜单使用，游戏会按需要自动取用或转移所需物品。也可以直接把箱中的工具拖到兼容的快捷槽。
-description=
-description=[h1]升级与使用[/h1]
-description=
-description=[olist]
-description=[*][b]安装钥匙扣[/b]需要 3 个受支持的钥匙圈类物品，三个都必须为空；请先取出其中的钥匙，再进行升级。
-description=[*]右键受支持的装备，查看升级需要的材料、部件、工具和技能，按需逐项安装。
-description=[*]装备在可访问的容器中时，满足条件后开始升级，会先自动取到随身物品栏。
-description=[*]穿戴装备后，通过快捷栏管理挂载物品。CD 机、收音机和对讲机可先手持并打开原版设备面板，再次点击关闭面板并收起。
-description=[*]固定口袋各自保留独立空间和内容；装备穿在身上、放在地上或放入其他可访问容器时，都可通过容器侧栏存取。
-description=[*]升级后的军用护具仍可左右换穿，口袋、挂件及内容随装备保留。
-description=[/olist]
-description=
-description=[h1]沙盒选项[/h1]
-description=
-description=六类装备分别提供“启用雇佣兵战术……”开关，默认全部开启。
-description=
-description=关闭某类装备的开关会清除对应升级并解除挂载；固定口袋及其中物品保留为独立容器，升级材料不返还。重新开启后需要重新升级。
-description=
-description=[h1]兼容性[/h1]
-description=
-description=支持 Project Zomboid Build 42.20、单人游戏、多人游戏和专用服务器。
-description=
-description=[b]Workshop ID:[/b] 3794244437
-description=[b]Mod ID:[/b] MercenaryLoadout
-description=[b]Version:[/b] RC1.3.2 build24
-description=
-description=[hr]
-description=
-description=[h1]Mercenary Tactical Loadout[/h1]
-description=
-description=[quote]Upgrade vanilla packs, ALICE rigs, belts and military armor piece by piece to build your own tactical loadout.[/quote]
-description=
-description=[h1]What Does a Full Loadout Add?[/h1]
-description=
-description=Fully upgrade and wear the complete set, including both sides of the armor, for [b]17 item mounts, 13 separate pouches and 1 key container[/b]. The pouches provide 81 total capacity, plus a capacity-10 key container. Mounted toolboxes and first-aid kits retain their own storage as well.
-description=
-description=The extra pouches and compartments help [b]organize supplies by category[/b], keeping tools, medical supplies and ammunition separate and easy to access. All counts below assume fully upgraded gear.
-description=
-description=[h1]Six Gear Components[/h1]
+description=[h2]English[/h2]
+description=Upgrade vanilla backpacks, ALICE webbing, belts and military armor with [b]17 attachment slots, 13 separate pouches (81 total capacity), and one key container (capacity10)[/b]. Separate compartments help organize tools, medical supplies and ammunition. Mounted kits retain their own storage capacity.
 description=
 description=[list]
-description=[*][b]Tactical Pack | 7 mounts + 3 pouches[/b]: a capacity-5 top pouch and two capacity-15 side pouches add 35 capacity. Separate mounts hold a canteen, first-aid kit, toolbox, mask, lantern, electronic device and plush toy at the same time.
-description=[*][b]Tactical Rig | 2 mounts + 2 pouches[/b]: upgrade an ALICE rig with capacity-5 bullet and shell pouches and their corresponding reload bonuses. Each shoulder holds one pistol, for two pistols in total.
-description=[*][b]Tactical Belt | 4 mounts + 2 pouches + 1 key container[/b]: two capacity-3 utility pouches and a capacity-10 key container. Each of the two gun mounts accepts a pistol or compatible long gun: [b]carry two long guns simultaneously[/b], one long gun and one pistol, or two pistols. Two additional utility loops accept compatible knives, swords, hammers, nightsticks, screwdrivers, wrenches and other supported tools or weapons, plus walkie-talkies and cordless phones.
-description=[*][b]Tactical Vambraces | 2 pouches across both arms[/b]: each military vambrace gains one capacity-5 pouch, for 10 total capacity.
-description=[*][b]Tactical Thigh Guards | 2 mounts + 4 pouches across both legs[/b]: each military thigh guard gains two capacity-5 pouches and one pistol mount, for 20 total capacity and two pistols.
-description=[*][b]Tactical Greaves | 2 mounts across both legs[/b]: each military greave gains a sheath for one compatible knife.
+description=[*][b]Backpack[/b]: three pouches (5+15+15), plus seven separate mounts for a water container, first-aid kit, toolbox, mask, lantern, electronic device and regular-size plush toy.
+description=[*][b]Webbing[/b]: a bullet pouch and shotgun-shell pouch (5 each) with corresponding reload bonuses; one additional pistol slot on each shoulder.
+description=[*][b]Belt[/b]: two pouches (3 each), a key container (10), two gun slots supporting two compatible long guns or pistol combinations, and two utility hooks for supported tools, melee weapons, walkie-talkies and cordless phones.
+description=[*][b]Arm guards[/b]: one pouch (5) on each side.
+description=[*][b]Thigh guards[/b]: two pouches (5 each) and one pistol slot on each side.
+description=[*][b]Greaves[/b]: one compatible blade slot on each side.
 description=[/list]
 description=
-description=[h1]Seven Pack Attachment Categories[/h1]
+description=[h2]Mounts and access[/h2]
+description=Supports compatible bottles/canteens/flasks, standard and specialist toolboxes/medical kits, gas masks/respirators/NBC/welding/Halloween/hockey/bone masks, oil/propane/crafted electric lanterns, CD players/radios/walkie-talkies, and regular-size plush toys on the pack's right side. Surgical masks, face wraps and balaclavas are excluded.
 description=
+description=[b]Carry a toolbox and first-aid kit together and use their contents without manually unpacking them first.[/b] Supported vanilla actions retrieve or transfer supplies as needed; tools can also be dragged directly to compatible hotbar slots.
+description=
+description=Hotbar and controller wheel actions equip electronic devices in the secondary hand and open the native panel; activate again to close it and stow the device. Power/playback remain manual device controls. Mounted devices can continue CD subtitles and radio reception; effects follow vanilla rules. Multiple mounted lights have separate wheel controls.
+description=
+description=[h2]Upgrades and settings[/h2]
 description=[list]
-description=[*][b]Canteen mount[/b]: water bottles, sports bottles, military canteens, clay canteens, cowboy canteens and flasks.
-description=[*][b]First-aid mount[/b]: standard and professional first-aid kits, plus camping and military medical bags.
-description=[*][b]Toolbox mount[/b]: standard, specialist and wooden toolboxes.
-description=[*][b]Mask mount[/b]: gas masks, half-face respirators, improvised gas masks, NBC masks, welding masks, Halloween masks, hockey masks and bone masks, including supported filter and material variants.
-description=[*][b]Lantern mount[/b]: hurricane lanterns and their material variants, propane lanterns and crafted electric lanterns.
-description=[*][b]Electronic-device mount[/b]: CD players, radios and walkie-talkies. Click the hotbar slot to hold the device and open its native panel; click again to close the panel and stow it.
-description=[*][b]Plush-toy mount[/b]: supported regular-size plush toys attach to the right side of the pack as decorations.
+description=[*]Right-click supported equipment for material, tool and skill requirements. Upgrading can retrieve equipment from an accessible container.
+description=[*]The key-container upgrade requires three supported key rings, all empty. It uses native key recognition.
+description=[*]Use the container sidebar or Move To for installed pouches, including when equipment is worn, on the ground or in an accessible container. Military armor can swap sides while retaining upgrades and contents.
+description=[*]Each component has an enable option. Disabling removes upgrades and attachments; pouches and contents remain separate containers, without material refunds.
+description=[*]Backpack and pocket weight multiplier:100/75/50/25/10/5 percent of vanilla-counted burden for tactical equipment itself, backpack/webbing contents, installed pouches and the key container. Ordinary attached items retain vanilla weight.
 description=[/list]
 description=
-description=[h1]Use Supplies Directly from Mounted Kits[/h1]
-description=
-description=[b]Mount one toolbox and one first-aid kit on the pack at the same time.[/b] While wearing the pack, both remain usable carried containers with their contents and normal storage access intact. [b]No need to manually drag tools or medical supplies into your main inventory first[/b]: use supported vanilla action menus, and the game retrieves or transfers the required items as needed. You can also drag tools straight from a mounted box into compatible hotbar slots.
-description=
-description=[h1]Upgrading and Use[/h1]
-description=
-description=[olist]
-description=[*][b]Installing the key container[/b] requires 3 supported key-ring items. All three must be empty; remove any keys before starting the upgrade.
-description=[*]Right-click supported gear to see the materials, components, tools and skills required, then install the upgrades you want.
-description=[*]If the gear is in an accessible container, starting an available upgrade automatically retrieves it into your inventory first.
-description=[*]Wear the gear and manage attachments through the hotbar. CD players, radios and walkie-talkies can be held to open their native device panel; click again to close the panel and stow the device.
-description=[*]Fixed pouches keep separate storage and contents. Access them through the container sidebar while the gear is worn, on the ground or inside another accessible container.
-description=[*]Upgraded military armor can switch between left and right sides while retaining its pouches, attachments and contents.
-description=[/olist]
-description=
-description=[h1]Sandbox Options[/h1]
-description=
-description=Each of the six components has an Enable Mercenary Tactical option. All are enabled by default.
-description=
-description=Disabling a component removes its upgrades and detaches mounted items. Fixed pouches and their contents remain as independent containers; upgrade materials are not refunded. Re-enabling a component requires upgrading it again.
-description=
-description=[h1]Compatibility[/h1]
-description=
-description=Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated servers.
-description=
-description=[b]Workshop ID:[/b] 3794244437
-description=[b]Mod ID:[/b] MercenaryLoadout
-description=[b]Version:[/b] RC1.3.2 build24
-
-[quote]将原版背包、爱丽丝背带、皮带和军用护具逐件升级，打造自己的战术携行套装。[/quote]
-
-[h1]六类战术装备[/h1]
-
-[list]
-[*][b]战术背包[/b]：增加容量 5 的上盖口袋、左右各容量 15 的侧袋，以及水壶、急救箱、工具箱、面具、提灯、电子设备和玩偶挂位。
-[*][b]战术背带[/b]：增加子弹与霰弹口袋，容量各 5，并提供对应装填加速；左右肩位各可安装一把手枪。
-[*][b]战术皮带[/b]：增加左右各容量 3 的便利袋、容量 10 的钥匙扣、双枪套和两个手机/工具通用挂环；双枪套支持手枪及兼容的长枪。
-[*][b]战术护臂[/b]：原版军用护臂每侧可增加一个容量 5 的口袋。
-[*][b]战术护腿[/b]：原版军用护腿每侧可增加两个容量 5 的口袋和一个手枪挂位。
-[*][b]战术护胫[/b]：原版军用护胫每侧可增加一个刀鞘。
-[/list]
-
-[h1]背包挂载[/h1]
-
-[list]
-[*][b]电子设备[/b]：仅支持 CD 机、收音机和对讲机。
-[*][b]面具[/b]：支持防毒面具（含 NBC 生化面罩及自制款）、呼吸器、焊工面罩、万圣节面具、曲棍球面具和骨制面具，共 24 个物品类型，包含滤芯和材质变体；不包含面巾、围巾、头套、套头袋及口罩。
-[*][b]玩偶[/b]：背包右侧可增加一个玩偶挂扣，支持 Spiffo、Pancho 狗等 12 种普通玩偶；不包含巨型 Spiffo、泰迪熊、人偶、鸭子和青蛙。
-[*][b]随身容器[/b]：挂载工具箱和急救箱后仍可直接存取物品，也可将工具拖入兼容的快捷槽。
-[/list]
-
-[h1]升级与使用[/h1]
-
-[olist]
-[*]右键受支持的装备，查看升级需要的材料、部件、工具和技能，按需逐项安装。
-[*]装备在可访问的容器中时，满足条件后开始升级，会先自动取到随身物品栏。
-[*]穿戴装备后，通过快捷栏管理挂载物品。CD 机、收音机和对讲机可先手持并打开原版设备面板，再次点击关闭面板并收起。
-[*]固定口袋各自保留独立空间和内容；装备穿在身上、放在地上或放入其他可访问容器时，都可通过容器侧栏存取。
-[*]升级后的军用护具仍可左右换穿，口袋、挂件及内容随装备保留。
-[/olist]
-
-[h1]沙盒选项[/h1]
-
-六类装备分别提供“启用雇佣兵战术……”开关，默认全部开启。
-
-关闭某类装备的开关会清除对应升级并解除挂载；固定口袋及其中物品保留为独立容器，升级材料不返还。重新开启后需要重新升级。
-
-[h1]兼容性[/h1]
-
-支持 Project Zomboid Build 42.20、单人游戏、多人游戏和专用服务器。
-
-[b]Workshop ID:[/b] 3794244437
-[b]Mod ID:[/b] MercenaryLoadout
-[b]Version:[/b] RC1.3.2 build23
-
-[hr]
-
-[h1]Mercenary Tactical Loadout[/h1]
-
-[quote]Upgrade vanilla packs, ALICE rigs, belts and military armor piece by piece to build your own tactical loadout.[/quote]
-
-[h1]Six Gear Components[/h1]
-
-[list]
-[*][b]Tactical Pack[/b]: a capacity-5 top pouch, two capacity-15 side pouches, and mounts for a canteen, first-aid kit, toolbox, mask, lantern, electronic device and plush toy.
-[*][b]Tactical Rig[/b]: capacity-5 bullet and shell pouches with their corresponding reload bonuses; each shoulder supports one pistol.
-[*][b]Tactical Belt[/b]: two capacity-3 utility pouches, a capacity-10 key ring, a double holster and two phone/tool utility loops. The double holster accepts pistols and compatible long guns.
-[*][b]Tactical Vambraces[/b]: each vanilla military vambrace can gain one capacity-5 pouch.
-[*][b]Tactical Thigh Guards[/b]: each vanilla military thigh guard can gain two capacity-5 pouches and one pistol mount.
-[*][b]Tactical Greaves[/b]: each vanilla military greave can gain one knife sheath.
-[/list]
-
-[h1]Pack Attachments[/h1]
-
-[list]
-[*][b]Electronic devices[/b]: CD players, radios and walkie-talkies only.
-[*][b]Masks[/b]: gas masks (including NBC and improvised models), respirators, welding masks, Halloween masks, hockey masks and bone masks. Supports 24 item types, including filter and material variants; excludes bandanas, scarves, balaclavas, head sacks, dust masks and surgical masks.
-[*][b]Plush toys[/b]: add a plush-toy hook on the right side of the pack. Supports 12 regular toys, including Spiffo and Pancho Dog; excludes Giant Spiffo, teddy bears, dolls, rubber ducks and frogs.
-[*][b]Carried containers[/b]: access mounted toolboxes and first-aid kits directly, and drag tools into compatible hotbar slots.
-[/list]
-
-[h1]Upgrading and Use[/h1]
-
-[olist]
-[*]Right-click supported gear to see the materials, components, tools and skills required, then install the upgrades you want.
-[*]If the gear is in an accessible container, starting an available upgrade automatically retrieves it into your inventory first.
-[*]Wear the gear and manage attachments through the hotbar. CD players, radios and walkie-talkies can be held to open their native device panel; click again to close the panel and stow the device.
-[*]Fixed pouches keep separate storage and contents. Access them through the container sidebar while the gear is worn, on the ground or inside another accessible container.
-[*]Upgraded military armor can switch between left and right sides while retaining its pouches, attachments and contents.
-[/olist]
-
-[h1]Sandbox Options[/h1]
-
-Each of the six components has an Enable Mercenary Tactical option. All are enabled by default.
-
-Disabling a component removes its upgrades and detaches mounted items. Fixed pouches and their contents remain as independent containers; upgrade materials are not refunded. Re-enabling a component requires upgrading it again.
-
-[h1]Compatibility[/h1]
-
-Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated servers.
-
-[b]Workshop ID:[/b] 3794244437
-[b]Mod ID:[/b] MercenaryLoadout
-[b]Version:[/b] RC1.3.2 build23
+description=Build42.20 · 单人/多人/专用服务器 / Singleplayer, multiplayer and dedicated servers
+description=Workshop ID:3794244437 · Mod ID:MercenaryLoadout · Version:1.3.2
 tags=Build 42;Multiplayer;Weapons;Clothing/Armor;Items
 visibility=private

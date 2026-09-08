@@ -11,5 +11,13 @@
   "Sandbox_MercenaryLoadout_Thigh": "启用雇佣兵战术护腿",
   "Sandbox_MercenaryLoadout_Thigh_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
   "Sandbox_MercenaryLoadout_Greave": "启用雇佣兵战术护胫",
-  "Sandbox_MercenaryLoadout_Greave_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。"
+  "Sandbox_MercenaryLoadout_Greave_tooltip": "关闭后物品恢复原版状态，容器内物品不会丢失；重新开启后需重新升级。",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect": "背包口袋负重倍率",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_tooltip": "按原版计重调整战术装备（包括背包和背带）自身、内部物资、安装口袋和钥匙扣的负重。数值越低越轻；普通挂载物品不受影响。容器按游戏精度取整。",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option1": "原版（100%%）",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option2": "75%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option3": "50%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option4": "25%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option5": "10%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option6": "5%%"
 }

@@ -11,5 +11,13 @@
   "Sandbox_MercenaryLoadout_Thigh": "啟用傭兵戰術護腿",
   "Sandbox_MercenaryLoadout_Thigh_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
   "Sandbox_MercenaryLoadout_Greave": "啟用傭兵戰術護脛",
-  "Sandbox_MercenaryLoadout_Greave_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。"
+  "Sandbox_MercenaryLoadout_Greave_tooltip": "關閉後物品恢復原版狀態，容器內物品不會遺失；重新開啟後需重新升級。",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect": "背包口袋負重倍率",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_tooltip": "按原版計重調整戰術裝備（包括背包和背帶）自身、內部物資、安裝口袋和鑰匙扣的負重。數值越低越輕；普通掛載物品不受影響。容器按遊戲精度取整。",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option1": "原版（100%%）",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option2": "75%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option3": "50%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option4": "25%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option5": "10%%",
+  "Sandbox_MercenaryLoadout_PouchReductionEffect_option6": "5%%"
 }

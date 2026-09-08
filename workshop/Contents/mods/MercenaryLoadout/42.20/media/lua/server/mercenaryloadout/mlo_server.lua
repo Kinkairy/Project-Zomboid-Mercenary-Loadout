@@ -92,6 +92,34 @@ end
 local function onClientCommand(module,command,player,args)
     if module~=M.MODULE or not player or not args then return end
 
+    if command=="prepareMountedTransfer" then
+        local ids=args.boxIds
+        local ok=type(ids)=="table" and #ids>0 and #ids<=2
+        if ok then
+            for _,id in ipairs(ids) do
+                local item
+                local matches=0
+                local rootItems=player:getInventory():getItems()
+                for index=0,rootItems:size()-1 do
+                    local candidate=rootItems:get(index)
+                    if candidate:getID()==tonumber(id) then item=candidate;matches=matches+1 end
+                end
+                if matches~=1 then ok=false;break end
+                local parent,slot=M.findPersistentMountParent(player,item)
+                if not item or not parent or item:getContainer()~=player:getInventory()
+                    or (slot~=M.MODULE_SLOT.packMedBox and slot~=M.MODULE_SLOT.packToolbox)
+                    or not M.ensureMountedContainerTransport(player,item) then
+                    ok=false
+                    break
+                end
+            end
+        end
+        sendServerCommand(player,M.MODULE,"mountedTransferPrepared",{
+            token=tonumber(args.token),playerId=player:getOnlineID(),ok=ok,
+        })
+        return
+    end
+
     if command=="clientReady" then
         migrateAndReady(player,"client-ready")
         return
@@ -151,15 +179,18 @@ Events.OnClientCommand.Add(onClientCommand)
 local function clearPlayerState(player)
     migratedPlayers[player]=nil
     M.clearComponentPlayerState(player)
+    M.clearPouchPlayerState(player)
 end
 
 -- Native sandbox updates have no Lua change event. The stable path only
 -- compares six booleans; inventories are visited once when a change is seen.
 addServerEvent("EveryOneMinute",function()
     local changed = M.takeComponentOptionsChange()
+    local pouchReductionChanged = M.takePouchReductionChange()
     local players = getOnlinePlayers()
     for index = 0, players:size()-1 do
         local player = players:get(index)
+        if pouchReductionChanged then M.syncFixedPouchWeights(player) end
         if changed then M.reconcileComponents(player)
         else M.flushComponentPublications(player, false) end
     end

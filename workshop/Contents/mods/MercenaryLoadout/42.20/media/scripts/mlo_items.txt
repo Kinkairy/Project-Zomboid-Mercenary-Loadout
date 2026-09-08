@@ -5,6 +5,8 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:KeyClip,
         Weight = 0.05,
         Capacity = 10,
         WeightReduction = 85,
@@ -13,6 +15,7 @@ module MercenaryLoadout
         CloseSound = CloseKeyRing,
         PutInSound = StoreItemKeyRing,
         AcceptItemFunction = AcceptItemFunction.KeyRing,
+        Tags = base:keyring,
         hidden = true,
     }
 
@@ -20,6 +23,8 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:BeltPouch1,
         Weight = 0.2,
         Capacity = 2,
         WeightReduction = 85,
@@ -53,9 +58,11 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:RigPouchL,
         Weight = 0.5,
         Capacity = 5,
-        WeightReduction = 65,
+        WeightReduction = 85,
         Icon = Satchel_Military,
         Tags = base:reloadfastbullets,
         hidden = true,
@@ -65,9 +72,11 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:RigPouchR,
         Weight = 0.5,
         Capacity = 5,
-        WeightReduction = 65,
+        WeightReduction = 85,
         Icon = Satchel_Military,
         Tags = base:reloadfastshells,
         hidden = true,
@@ -77,6 +86,8 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:PackTopPouch,
         Weight = 0.2,
         Capacity = 2,
         WeightReduction = 85,
@@ -88,9 +99,11 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:PackSidePouchL,
         Weight = 0.5,
         Capacity = 3,
-        WeightReduction = 65,
+        WeightReduction = 85,
         Icon = Satchel_Military,
         hidden = true,
     }
@@ -99,9 +112,11 @@ module MercenaryLoadout
     {
         DisplayCategory = Container,
         ItemType = base:container,
+        ClothingItem = MLO_FixedPouch,
+        CanBeEquipped = MercenaryLoadout:PackSidePouchR,
         Weight = 0.5,
         Capacity = 3,
-        WeightReduction = 65,
+        WeightReduction = 85,
         Icon = Satchel_Military,
         hidden = true,
     }

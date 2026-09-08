@@ -42,6 +42,14 @@
 - 固定口袋各自保留独立空间和内容；装备穿在身上、放在地上或放入其他可访问容器时，都可通过容器侧栏存取。
 - 升级后的军用护具仍可左右换穿，口袋、挂件及内容随装备保留。
 
+## 播放、容器与负重
+
+快捷栏和手柄轮盘共用操作：将电子设备拿到副手并打开原版面板，再次操作收起面板并挂回；电源与播放由设备面板手动控制。挂载后可继续显示 CD 字幕、接收广播，效果遵循原版规则。多盏挂载灯可在轮盘分别开关。
+
+安装口袋、钥匙容器、挂载工具箱和急救箱均可通过“移动到”存入物品，沿用原版容量与转移动作。钥匙容器使用原版钥匙识别。
+
+“背包口袋负重倍率”提供 100%、75%、50%、25%、10%、5%：对战术装备本身、背包/背带内容、安装口袋和钥匙容器的原版计重结果乘倍率，数值越低越轻。普通挂载物品仍按原版计算。
+
 ## 沙盒选项
 
 六类装备分别提供“启用雇佣兵战术……”开关，默认全部开启。
@@ -54,7 +62,7 @@
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** RC1.3.2 build24
+**Version:** 1.3.2
 
 ---
 
@@ -112,8 +120,16 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** RC1.3.2 build24
+**Version:** 1.3.2
 
 ## License / 许可证
 
 MIT. Vanilla game assets are referenced, not redistributed.
+
+## Playback, containers and weight
+
+Hotbar and controller wheel actions equip an electronic device in the secondary hand and open its native panel. Activate again to close and stow it; power and playback remain manual controls. Mounted devices can continue CD subtitles and radio reception, following native effects. Multiple mounted lights have separate wheel controls.
+
+Installed pouches, the key container, mounted toolboxes and first-aid kits are available through Move To, using vanilla capacity checks and transfer actions. The key container uses native key recognition.
+
+Backpack and pocket weight multiplier offers 100%, 75%, 50%, 25%, 10% and 5% of vanilla-counted burden for tactical equipment itself, backpack/webbing contents, installed pouches and the key container. Lower values are lighter. Ordinary attached items retain vanilla weight.

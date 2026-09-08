@@ -23,3 +23,7 @@ option MercenaryLoadout.Thigh = {
 option MercenaryLoadout.Greave = {
     type = boolean, default = true, page = MercenaryLoadout, translation = MercenaryLoadout_Greave,
 }
+
+option MercenaryLoadout.PouchReductionEffect = {
+    type = enum, numValues = 6, default = 1, page = MercenaryLoadout, translation = MercenaryLoadout_PouchReductionEffect,
+}

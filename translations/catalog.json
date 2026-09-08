@@ -26,16 +26,16 @@
     {
       "key": "IGUI_HotbarAttachment_MLO_Belt_ToolL",
       "en": "Left Belt Clip",
-      "cn": "腰带左挂扣",
-      "ch": "腰帶左掛扣",
+      "cn": "皮带左挂扣",
+      "ch": "皮帶左掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
     {
       "key": "IGUI_HotbarAttachment_MLO_Belt_ToolR",
       "en": "Right Belt Clip",
-      "cn": "腰带右挂扣",
-      "ch": "腰帶右掛扣",
+      "cn": "皮带右挂扣",
+      "ch": "皮帶右掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -714,16 +714,16 @@
     {
       "key": "IGUI_MLO_Name_BeltPouch1",
       "en": "Left Belt Pouch",
-      "cn": "腰带左袋",
-      "ch": "腰帶左袋",
+      "cn": "皮带左袋",
+      "ch": "皮帶左袋",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
     {
       "key": "IGUI_MLO_Name_BeltPouch2",
       "en": "Right Belt Pouch",
-      "cn": "腰带右袋",
-      "ch": "腰帶右袋",
+      "cn": "皮带右袋",
+      "ch": "皮帶右袋",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -842,8 +842,8 @@
     {
       "key": "IGUI_MLO_Name_TacticalBelt",
       "en": "Mercenary Tactical Belt",
-      "cn": "雇佣兵战术腰带",
-      "ch": "傭兵戰術腰帶",
+      "cn": "雇佣兵战术皮带",
+      "ch": "傭兵戰術皮帶",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -938,16 +938,16 @@
     {
       "key": "IGUI_MLO_Slot_BeltToolL",
       "en": "Left Belt Clip",
-      "cn": "腰带左挂扣",
-      "ch": "腰帶左掛扣",
+      "cn": "皮带左挂扣",
+      "ch": "皮帶左掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
     {
       "key": "IGUI_MLO_Slot_BeltToolR",
       "en": "Right Belt Clip",
-      "cn": "腰带右挂扣",
-      "ch": "腰帶右掛扣",
+      "cn": "皮带右挂扣",
+      "ch": "皮帶右掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -1162,16 +1162,16 @@
     {
       "key": "IGUI_MLO_Upgrade_BeltPouch1",
       "en": "Install Left Belt Pouch",
-      "cn": "安装腰带左袋",
-      "ch": "安裝腰帶左袋",
+      "cn": "安装皮带左袋",
+      "ch": "安裝皮帶左袋",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
     {
       "key": "IGUI_MLO_Upgrade_BeltPouch2",
       "en": "Install Right Belt Pouch",
-      "cn": "安装腰带右袋",
-      "ch": "安裝腰帶右袋",
+      "cn": "安装皮带右袋",
+      "ch": "安裝皮帶右袋",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -1186,16 +1186,16 @@
     {
       "key": "IGUI_MLO_Upgrade_BeltToolL",
       "en": "Install Left Belt Clip",
-      "cn": "安装腰带左挂扣",
-      "ch": "安裝腰帶左掛扣",
+      "cn": "安装皮带左挂扣",
+      "ch": "安裝皮帶左掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
     {
       "key": "IGUI_MLO_Upgrade_BeltToolR",
       "en": "Install Right Belt Clip",
-      "cn": "安装腰带右挂扣",
-      "ch": "安裝腰帶右掛扣",
+      "cn": "安装皮带右挂扣",
+      "ch": "安裝皮帶右掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     },
@@ -1370,8 +1370,8 @@
     {
       "key": "MercenaryLoadout.MLO_KeyClip",
       "en": "Belt Key Clip",
-      "cn": "腰带钥匙扣",
-      "ch": "腰帶鑰匙扣",
+      "cn": "皮带钥匙扣",
+      "ch": "皮帶鑰匙扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/ItemName.json"
     },
@@ -1806,6 +1806,70 @@
       "ch": "安裝玩偶掛扣",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect",
+      "en": "Backpack and pocket weight multiplier",
+      "cn": "背包口袋负重倍率",
+      "ch": "背包口袋負重倍率",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_tooltip",
+      "en": "Scales the native weight of tactical equipment (including backpack and harness), their contents, installed pockets and key clips. Lower is lighter. Ordinary attached items are unchanged. Container rounding follows the game.",
+      "cn": "按原版计重调整战术装备（包括背包和背带）自身、内部物资、安装口袋和钥匙扣的负重。数值越低越轻；普通挂载物品不受影响。容器按游戏精度取整。",
+      "ch": "按原版計重調整戰術裝備（包括背包和背帶）自身、內部物資、安裝口袋和鑰匙扣的負重。數值越低越輕；普通掛載物品不受影響。容器按遊戲精度取整。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_option1",
+      "en": "Original (100%%)",
+      "cn": "原版（100%%）",
+      "ch": "原版（100%%）",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_option2",
+      "en": "75%%",
+      "cn": "75%%",
+      "ch": "75%%",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_option3",
+      "en": "50%%",
+      "cn": "50%%",
+      "ch": "50%%",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_option4",
+      "en": "25%%",
+      "cn": "25%%",
+      "ch": "25%%",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_option5",
+      "en": "10%%",
+      "cn": "10%%",
+      "ch": "10%%",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "Sandbox_MercenaryLoadout_PouchReductionEffect_option6",
+      "en": "5%%",
+      "cn": "5%%",
+      "ch": "5%%",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
     }
   ]
 }
