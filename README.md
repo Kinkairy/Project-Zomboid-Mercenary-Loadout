@@ -10,6 +10,10 @@
 
 新增的独立口袋和格子用于**分类存放物资**，方便把工具、医疗用品、弹药等分开收纳与取用。以下数量按全套升级完成计算。
 
+## 用哪些装备升级？
+
+背包：大登山包（含旅行款）、军用行李袋、大型背包、军用背包（含军绿、沙漠迷彩与生存者款）。背带：爱丽丝背带普通、绿色、迷彩款。皮带：原版皮带。护臂、护腿、护胫：仅支持**军用防弹款**，左右均可升级。
+
 ## 六类战术装备
 
 - **战术背包｜7 个挂位 + 3 个口袋**：上盖口袋容量 5，左右侧袋各 15，额外口袋容量合计 35。水壶、急救箱、工具箱、面具、提灯、电子设备和玩偶各有一个独立挂位，可同时挂载。
@@ -75,6 +79,10 @@
 Fully upgrade and wear the complete set, including both sides of the armor, for **17 item mounts, 13 separate pouches and 1 key container**. The pouches provide 81 total capacity, plus a capacity-10 key container. Mounted toolboxes and first-aid kits retain their own storage as well.
 
 The extra pouches and compartments help **organize supplies by category**, keeping tools, medical supplies and ammunition separate and easy to access. All counts below assume fully upgraded gear.
+
+## Which items can be upgraded?
+
+Big Hiking Backpacks (including travel variants), the supported military Duffel Bag, Military/Large Backpacks (including army, desert-camo and survivor variants); standard/green/camo ALICE Belt and Suspenders; the vanilla Belt; and **military bulletproof forearm, thigh and shin armor**, both sides.
 
 ## Six Gear Components
 
