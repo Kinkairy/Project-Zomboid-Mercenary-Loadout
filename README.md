@@ -66,7 +66,7 @@
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.2
+**Version:** 1.3.3
 
 ---
 
@@ -128,7 +128,7 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.2
+**Version:** 1.3.3
 
 ## License / 许可证
 

@@ -72,9 +72,9 @@ function MLOUpgradeAction:complete()
                 M.writeMessagePayload(payload,
                     M.message("IGUI_MLO_Status_UpgradeComplete",M.textArgument(def.labelKey)))
             end
-            sendServerCommand(self.character,M.MODULE,"stateChanged",payload)
+            M.sendPlayerCommand(self.character,"stateChanged",payload)
         else
-            sendServerCommand(self.character,M.MODULE,"failed",M.writeMessagePayload({},reason))
+            M.sendPlayerCommand(self.character,"failed",M.writeMessagePayload({},reason))
         end
     end
     return applied==true
@@ -117,7 +117,7 @@ function ISUnequipAction:complete(...)
             M.logOnce("unequip-unmount:"..tostring(item:getID()),
                 "failed to clear mounted items after vanilla unequip")
         elseif count>0 and type(isServer)=="function" and isServer()==true then
-            sendServerCommand(player,M.MODULE,"stateChanged",{
+            M.sendPlayerCommand(player,"stateChanged",{
                 itemId=item:getID(),version=M.VERSION,
             })
         end

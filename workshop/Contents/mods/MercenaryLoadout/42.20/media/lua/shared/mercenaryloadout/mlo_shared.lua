@@ -4,8 +4,8 @@ MercenaryAcceptItemFunction = MercenaryAcceptItemFunction or {}
 require "NPCs/BodyLocations"
 
 local M = MercenaryLoadout
-M.VERSION = "RC1.3.2"
-M.BUILD = 24
+M.VERSION = "RC1.3.3"
+M.BUILD = 25
 M.MODULE = "MercenaryLoadout"
 
 M.TYPE = {
@@ -935,6 +935,17 @@ function M.writeMessagePayload(payload, message)
     return payload
 end
 
+-- A connection may own several local players. Every targeted notification
+-- carries the authoritative recipient, never an identity supplied by a client.
+function M.sendPlayerCommand(player, command, payload)
+    if not player then return false end
+    local message = {}
+    for key, value in pairs(payload or {}) do message[key] = value end
+    message.playerId = player:getOnlineID()
+    sendServerCommand(player, M.MODULE, command, message)
+    return true
+end
+
 function M.readMessagePayload(payload)
     if not payload or not payload.messageKey then return nil end
     local args = {}
@@ -1227,24 +1238,187 @@ function M.repairLegacyVanillaContainers(player, forceCurrentSchema, localOnly)
     return true, changedCount, nil
 end
 
--- Build 42's ContainerID treats an ItemContainer whose parent is the player as
--- PlayerInventory.  A held InventoryContainer instead keeps the outer item in
--- the player's root inventory while its inner container has no world/player
--- parent and points back through containingItem.  Preserve that exact vanilla
--- ownership chain for mounted medical kits/toolboxes without occupying a hand.
-function M.ensureMountedContainerTransport(player, item, tx, snapshot)
-    if not player or not item then return false, false, "missing-item" end
-    local parent, slotId=M.findPersistentMountParent(player,item,snapshot)
-    if not parent or (slotId~=M.MODULE_SLOT.packMedBox and slotId~=M.MODULE_SLOT.packToolbox) then
-        return true, false, nil
+M.CONTAINER_TRANSPORT_LIMIT = 4096
+
+-- Ownership uses actual membership/backrefs, never the stale routing parent.
+function M.isOwnedContainerItem(player, item)
+    if not player or not item then return false, "missing-item" end
+    local root=safeCall(function() return player:getInventory() end,nil)
+    if not root then return false, "missing-root" end
+    local current,seenItems,seenContainers,visited=item,{},{},0
+    while current do
+        if seenItems[current] then return false, "owned-container-cycle" end
+        seenItems[current]=true
+        local container=safeCall(function() return current:getContainer() end,nil)
+        if not container then return false, "container-not-owned" end
+        if seenContainers[container] then return false, "owned-container-cycle" end
+        seenContainers[container]=true
+        local values=safeCall(function() return container:getItems() end,nil)
+        local size=values and safeCall(function() return values:size() end,nil) or nil
+        if not size or size<0 or visited+size>M.CONTAINER_TRANSPORT_LIMIT then
+            return false, "owned-container-limit"
+        end
+        local matches=0
+        local currentId=safeCall(function() return tonumber(current:getID()) end,nil)
+        if not currentId or currentId~=currentId or currentId%1~=0 then
+            return false,"owned-container-invalid-id"
+        end
+        for index=0,size-1 do
+            local candidate=values:get(index)
+            visited=visited+1
+            if candidate==current then matches=matches+1
+            elseif currentId~=nil and safeCall(function() return candidate:getID() end,nil)==currentId then
+                return false, "owned-container-duplicate-id"
+            end
+        end
+        if matches~=1 then return false, "owned-container-membership-mismatch" end
+        if container==root then return true, nil end
+        local outer=safeCall(function() return container:getContainingItem() end,nil)
+        if not outer then return false, "container-not-owned" end
+        if not safeCall(function() return outer:IsInventoryContainer() end,false)
+            or safeCall(function() return outer:getInventory() end,nil)~=container then
+            return false, "owned-container-backref-mismatch"
+        end
+        current=outer
     end
+    return false, "container-not-owned"
+end
+
+-- Only selected, actually owned subtrees are visited. Clearly off-body items
+-- are irrelevant; malformed descendants of an owned selection are errors.
+function M.collectOwnedTransportBoxes(player, items)
+    if not player or type(items)~="table" then return nil, "invalid-selection" end
+    -- Relevance discovery has no ownership budget: large ordinary bags/items
+    -- must keep their native path. Exact bounded validation follows only when
+    -- a selected subtree contains one of the native boxes this adapter owns.
+    local discovery,discovered,relevant={}, {}, false
+    for _,item in ipairs(items) do if item then discovery[#discovery+1]=item end end
+    local discoveryIndex=1
+    while discoveryIndex<=#discovery and not relevant do
+        local item=discovery[discoveryIndex]
+        discoveryIndex=discoveryIndex+1
+        if not discovered[item] then
+            discovered[item]=true
+            if M.VANILLA_CONTAINER_STATE[M.fullType(item)] then relevant=true
+            elseif safeCall(function() return item:IsInventoryContainer() end,false) then
+                local inner=safeCall(function() return item:getInventory() end,nil)
+                local values=inner and safeCall(function() return inner:getItems() end,nil)
+                if values then
+                    for index=0,values:size()-1 do
+                        local child=values:get(index)
+                        if child and not discovered[child] then discovery[#discovery+1]=child end
+                    end
+                end
+            end
+        end
+    end
+    if not relevant then return {},nil end
+    if #items>M.CONTAINER_TRANSPORT_LIMIT then return nil,"owned-container-limit" end
+    local root=safeCall(function() return player:getInventory() end,nil)
+    if not root then return nil, "missing-root" end
+    -- Discard clearly foreign/ground endpoints before reading the own root.
+    -- This is only relevance filtering; exact membership still follows below.
+    local selections={}
+    for _,item in ipairs(items) do
+        local current,seen=item,{}
+        while current do
+            if seen[current] then selections[#selections+1]=item;break end
+            seen[current]=true
+            local container=safeCall(function() return current:getContainer() end,nil)
+            if container==root then selections[#selections+1]=item;break end
+            if not container then break end
+            local outer=safeCall(function() return container:getContainingItem() end,nil)
+            if not outer then break end
+            if safeCall(function() return outer:getInventory() end,nil)~=container then
+                selections[#selections+1]=item;break
+            end
+            current=outer
+        end
+    end
+    if #selections==0 then return {},nil end
+    local rootItems=root:getItems()
+    if rootItems:size()>M.CONTAINER_TRANSPORT_LIMIT then return nil, "owned-container-limit" end
+    local rootMembers={}
+    for index=0,rootItems:size()-1 do
+        local item=rootItems:get(index)
+        if not item or rootMembers[item] then return nil, "owned-container-membership-mismatch" end
+        rootMembers[item]=true
+    end
+    local pending,selected,scheduled={},{},{}
+    local function enqueue(item,container)
+        if scheduled[item] then
+            if scheduled[item]~=container then return false,"owned-container-membership-mismatch" end
+            return true
+        end
+        if #pending>=M.CONTAINER_TRANSPORT_LIMIT then return false,"owned-container-limit" end
+        scheduled[item]=container
+        pending[#pending+1]={item=item,container=container}
+        return true
+    end
+    for _,item in ipairs(selections) do
+        if item and not selected[item] then
+            selected[item]=true
+            local source=safeCall(function() return item:getContainer() end,nil)
+            local owned,reason
+            if source==root then
+                owned=rootMembers[item]==true
+                reason="owned-container-membership-mismatch"
+            else owned,reason=M.isOwnedContainerItem(player,item) end
+            if owned then
+                local queued,queueReason=enqueue(item,source)
+                if not queued then return nil,queueReason end
+            elseif reason~="container-not-owned" then return nil,reason end
+        end
+    end
+    local boxes,seenItems,seenContainers,byId={},{},{},{}
+    local index,visited=1,0
+    while index<=#pending do
+        local entry=pending[index]
+        index=index+1
+        local item=entry.item
+        if safeCall(function() return item:getContainer() end,nil)~=entry.container then
+            return nil,"owned-container-membership-mismatch"
+        end
+        if not seenItems[item] then
+            seenItems[item]=true
+            visited=visited+1
+            if visited>M.CONTAINER_TRANSPORT_LIMIT then return nil,"owned-container-limit" end
+            local id=safeCall(function() return tonumber(item:getID()) end,nil)
+            if not id or id~=id or id%1~=0 or byId[id] then return nil,"owned-container-duplicate-id" end
+            byId[id]=item
+            if safeCall(function() return item:IsInventoryContainer() end,false) then
+                local inner=safeCall(function() return item:getInventory() end,nil)
+                if not inner or safeCall(function() return inner:getContainingItem() end,nil)~=item then
+                    return nil,"owned-container-backref-mismatch"
+                end
+                if inner==root or seenContainers[inner] then return nil,"owned-container-cycle" end
+                seenContainers[inner]=true
+                if M.VANILLA_CONTAINER_STATE[M.fullType(item)] then
+                    boxes[#boxes+1]={item=item,inventory=inner}
+                end
+                local values=inner:getItems()
+                if visited+values:size()>M.CONTAINER_TRANSPORT_LIMIT then return nil,"owned-container-limit" end
+                local siblings={}
+                for childIndex=0,values:size()-1 do
+                    local child=values:get(childIndex)
+                    if not child or siblings[child] or child==item then return nil,"owned-container-cycle" end
+                    siblings[child]=true
+                    local queued,queueReason=enqueue(child,inner)
+                    if not queued then return nil,queueReason end
+                end
+            end
+        end
+    end
+    return boxes,nil
+end
+
+-- ContainerID prioritizes inner.parent=player as PlayerInventory. Preserve the
+-- native containingItem ownership chain, including boxes within owned bags.
+local function normalizeContainerTransport(player, item, tx)
+    if not player or not item then return false, false, "missing-item" end
     if not M.VANILLA_CONTAINER_STATE[M.fullType(item)]
         or not safeCall(function() return item:IsInventoryContainer() end,false) then
         return false, false, "not-vanilla-inventory-container"
-    end
-    if safeCall(function() return item:getContainer() end,nil)~=player:getInventory()
-        or M.getPersistentMountId(parent,slotId)~=tonumber(item:getID()) then
-        return false, false, "mounted-container-not-in-root"
     end
     local inventory=safeCall(function() return item:getInventory() end,nil)
     if not inventory then return false, false, "missing-inner-container" end
@@ -1265,6 +1439,34 @@ function M.ensureMountedContainerTransport(player, item, tx, snapshot)
         return false, false, "inner-parent-clear-failed"
     end
     return true, true, nil
+end
+
+function M.ensureOwnedContainerTransport(player, item, tx)
+    local owned,ownedReason=M.isOwnedContainerItem(player,item)
+    if not owned then return false,false,ownedReason end
+    return normalizeContainerTransport(player,item,tx)
+end
+
+function M.ensureRootContainerTransport(player, item, tx)
+    if not player or not item then return false,false,"missing-item" end
+    if safeCall(function() return item:getContainer() end,nil)~=player:getInventory() then
+        return false,false,"mounted-container-not-in-root"
+    end
+    -- Mounted UI projection already resolved the persistent exact root item;
+    -- retain its strict root boundary without rescanning the entire inventory.
+    return normalizeContainerTransport(player,item,tx)
+end
+
+function M.ensureMountedContainerTransport(player, item, tx, snapshot)
+    if not player or not item then return false, false, "missing-item" end
+    local parent, slotId=M.findPersistentMountParent(player,item,snapshot)
+    if not parent or (slotId~=M.MODULE_SLOT.packMedBox and slotId~=M.MODULE_SLOT.packToolbox) then
+        return true, false, nil
+    end
+    if M.getPersistentMountId(parent,slotId)~=tonumber(item:getID()) then
+        return false, false, "mounted-container-not-in-root"
+    end
+    return M.ensureRootContainerTransport(player,item,tx)
 end
 
 function M.dynamicNameKey(item)
@@ -1663,41 +1865,93 @@ function M.markEquipDirty(tx)
     if tx then tx.equipDirty = true end
 end
 
+-- Publication is a separate phase from reversible local mutation. Native add
+-- packets reject duplicate IDs; native server removal packets remove by ID.
+-- Retrying only failed calls converges recipients without recreating any item.
+local transactionPublications = {}
+local PUBLICATION_ATTEMPTS = 3
 local function flushNetwork(tx)
     if not tx then return true end
     local role = networkRole()
     if not role then return true end
     local ok = true
     for _, op in ipairs(tx.networkOps) do
-        local sent = pcall(function()
-            if op.kind == "remove" then
-                sendRemoveItemFromContainer(op.container, op.item)
-            elseif op.kind == "add" then
-                sendAddItemToContainer(op.container, op.item)
+        if not op.published then
+            local retry = op.attempted == true
+            local sent = false
+            -- Client remove retries can trigger vanilla contested-item handling.
+            -- Only the authoritative server may replay structural publication.
+            if not retry or role == "server" then
+                op.attempted = true
+                sent = pcall(function()
+                    local current = op.item:getContainer()
+                    if current == op.container then
+                        sendAddItemToContainer(op.container, op.item)
+                    else
+                        sendRemoveItemFromContainer(op.container, op.item)
+                    end
+                end)
             end
-        end)
-        if not sent then ok = false end
-    end
-    for item in pairs(tx.dirtyItems) do
-        local container = safeCall(function() return item:getContainer() end, nil)
-        if not tx.newItems[item] and container ~= nil then
-            local synced
-            synced = pcall(function() item:syncItemFields() end)
-            if not synced then ok = false end
+            if sent then
+                op.published = true
+                if retry then tx.newItems[op.item] = nil end
+            else ok = false end
         end
     end
-    if tx.equipDirty then
-        local synced = pcall(function() sendEquip(tx.player) end)
-        if not synced then ok = false end
+    local syncedItems = {}
+    for item in pairs(tx.dirtyItems) do
+        local container = safeCall(function() return item:getContainer() end, nil)
+        if tx.newItems[item] or container == nil then
+            -- New objects carry all fields in their native add packet.
+        elseif pcall(function() item:syncItemFields() end) then
+            syncedItems[#syncedItems + 1] = item
+        else ok = false end
     end
-    if not ok then
-        M.logOnce("network-sync:" .. tostring(tx), "one or more vanilla inventory/equipment sync calls failed")
+    for _, item in ipairs(syncedItems) do tx.dirtyItems[item] = nil end
+    if tx.equipDirty then
+        if pcall(function() sendEquip(tx.player) end) then tx.equipDirty = false
+        else ok = false end
     end
     return ok
 end
 
+function M.hasPendingTransactionPublication(player)
+    return transactionPublications[player] ~= nil
+end
+
+function M.flushTransactionPublications(player)
+    local pending = transactionPublications[player]
+    if not pending then return true end
+    if #pending == 0 then return pending.exhausted ~= true end
+    local remaining = {exhausted=pending.exhausted}
+    for _, tx in ipairs(pending) do
+        if tx.publicationAttempts < PUBLICATION_ATTEMPTS then
+            tx.publicationAttempts = tx.publicationAttempts + 1
+            if flushNetwork(tx) then tx.publicationState = "published"
+            elseif tx.publicationAttempts >= PUBLICATION_ATTEMPTS then
+                tx.publicationState = "exhausted"
+                M.logOnce("publication-exhausted:" .. tostring(player),
+                    "committed inventory retained; native publication retries exhausted; reconnect/reconciliation required")
+            end
+        end
+        if tx.publicationState == "exhausted" then
+            -- Retain one diagnostic bit, not every original item/transaction
+            -- forever. No per-minute scan remains after retries are exhausted.
+            remaining.exhausted = true
+        elseif tx.publicationState ~= "published" then remaining[#remaining + 1] = tx
+        else tx.networkOps, tx.dirtyItems, tx.newItems = {}, {}, {} end
+    end
+    transactionPublications[player] = (#remaining > 0 or remaining.exhausted) and remaining or nil
+    return transactionPublications[player] == nil
+end
+
+function M.clearTransactionPublications(player)
+    transactionPublications[player] = nil
+end
+
 function M.rollbackTransaction(tx)
     if not tx then return true end
+    if tx.publicationState then return false end -- published mutations cannot be locally undone
     local restored = true
     for i = #tx.undos, 1, -1 do
         local ok, result = pcall(tx.undos[i])
@@ -1717,19 +1971,28 @@ end
 
 function M.commitTransaction(tx)
     if not tx then return true end
-    local synced = flushNetwork(tx)
-    if not synced then
-        if M.rollbackTransaction(tx) then
-            return false, M.message("IGUI_MLO_Error_SyncState")
-        end
-        return false, M.message("IGUI_MLO_Error_RollbackFailed")
-    end
+    if tx.publicationState then return true end
+    -- Commit locally BEFORE the first externally visible native packet.
     tx.undos = {}
-    tx.networkOps = {}
-    tx.dirtyItems = {}
-    tx.newItems = {}
-    tx.equipDirty = false
-    return synced
+    tx.materialSnapshots = {}
+    tx.publicationState = "committed"
+    tx.publicationAttempts = 1
+    if flushNetwork(tx) then
+        tx.publicationState = "published"
+        tx.networkOps, tx.dirtyItems, tx.newItems = {}, {}, {}
+        return true
+    end
+    local pending = transactionPublications[tx.player] or {}
+    transactionPublications[tx.player] = pending
+    pending[#pending + 1] = tx
+    M.logOnce("network-sync:" .. tostring(tx.player),
+        "inventory committed; incomplete native publication queued for bounded retry (no local rollback)")
+    if networkRole() == "server" then
+        pcall(function()
+            M.sendPlayerCommand(tx.player, "failed", M.writeMessagePayload({}, M.message("IGUI_MLO_Error_SyncState")))
+        end)
+    end
+    return true, M.message("IGUI_MLO_Error_SyncState")
 end
 
 function M.abortTransaction(tx, reason)
@@ -4328,7 +4591,7 @@ function M.flushComponentPublications(player, retry)
     if flushNetwork(pending) then
         local notified = pcall(function()
             if networkRole() == "server" then
-                sendServerCommand(player, M.MODULE, "componentsChanged", {})
+                M.sendPlayerCommand(player, "componentsChanged", {})
             elseif type(M.clientComponentsChanged) == "function" then M.clientComponentsChanged(player) end
         end)
         if notified then componentPublications[player] = nil return true end

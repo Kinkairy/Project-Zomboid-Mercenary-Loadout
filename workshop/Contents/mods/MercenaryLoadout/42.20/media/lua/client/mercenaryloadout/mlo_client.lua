@@ -76,7 +76,9 @@ local function vanillaAmmoStrapBonusApplied(character, shell)
     local strapClothing = strap and safeCharacterCall(function() return strap:getClothingItem() end, nil) or nil
     if not (equippedShell or equippedBullets or strapClothing) then return false end
     local wornTag = shell and ItemTag.RELOAD_FAST_SHELLS or ItemTag.RELOAD_FAST_BULLETS
-    local hasMatchingTag = shell and equippedShell or equippedBullets
+    local hasMatchingTag
+    if shell then hasMatchingTag = equippedShell
+    else hasMatchingTag = equippedBullets end
     hasMatchingTag = hasMatchingTag or safeCharacterCall(function()
         return character:hasWornTag(wornTag)
     end, false)
@@ -216,10 +218,14 @@ local function isMloRelevantItem(item)
             or md.MLO_moduleKey~=nil or md.MLO_mountSlotId~=nil))
 end
 
-local function currentTransferItems(action)
+local function currentTransferItems(action,allGroups)
     local items={}
     local queued=action.queueList and action.queueList[1] or nil
-    if queued and queued.items then
+    if allGroups and action.queueList and #action.queueList>0 then
+        for _,group in ipairs(action.queueList) do
+            for _,item in ipairs(group.items or {}) do items[#items+1]=item end
+        end
+    elseif queued and queued.items then
         for _,item in ipairs(queued.items) do items[#items+1]=item end
     elseif action.item then
         items[1]=action.item
@@ -240,15 +246,7 @@ local function captureTransferRootExitRelations(action)
         local relation=rootExitRelation and rootExitRelation(player,item) or nil
         if relation then relations[relation.itemId]=relation end
     end
-    if action.queueList then
-        for _,queued in ipairs(action.queueList) do
-            if queued and queued.items then
-                for _,item in ipairs(queued.items) do capture(item) end
-            end
-        end
-    elseif action.item then
-        capture(action.item)
-    end
+    for _,item in ipairs(currentTransferItems(action,true)) do capture(item) end
     action.MLO_rootExitRelations=hasTableEntries(relations) and relations or nil
 end
 
@@ -268,19 +266,20 @@ function ISInventoryTransferAction:forceCancel(...)
     if vanillaInventoryTransferForceCancel then return vanillaInventoryTransferForceCancel(self,...) end
 end
 local function mountedTransferBoxes(action)
-    local boxes,seen={},{}
     local player=action.character
+    local items=currentTransferItems(action,true)
     for _,container in ipairs({action.srcContainer,action.destContainer}) do
         local item=container and container:getContainingItem()
-        if item and M.VANILLA_CONTAINER_STATE[M.fullType(item)]
-            and item:getContainer()==player:getInventory() then
-            local parent,slot=M.findPersistentMountParent(player,item)
-            if parent and (slot==M.MODULE_SLOT.packMedBox or slot==M.MODULE_SLOT.packToolbox)
-                and item:getInventory()==container and not seen[item] then
-                boxes[#boxes+1]={item=item,inventory=container,parent=parent,slot=slot}
-                seen[item]=true
-            end
-        end
+        -- Endpoints need their own address, not the addresses of every box
+        -- stored inside an otherwise unrelated destination bag.
+        if item and M.VANILLA_CONTAINER_STATE[M.fullType(item)] then items[#items+1]=item end
+    end
+    -- A clean client parent is not proof of server ownership. Prepare every
+    -- supported box in selected owned subtrees, including detached boxes.
+    local boxes,reason=M.collectOwnedTransportBoxes(player,items)
+    if not boxes then return nil,reason end
+    for _,box in ipairs(boxes) do
+        box.parent,box.slot=M.findPersistentMountParent(player,box.item)
     end
     return boxes
 end
@@ -293,37 +292,50 @@ local function sameMountedTransferBoxes(a,b)
     end
     return true
 end
+-- Shared cancellation scope for native transfer/place actions and trade UI.
+-- true permits the native operation, nil waits, false rejects without moving.
+local function prepareBoxTransport(owner,player,boxes)
+    local state=owner.MLO_transportPrepare
+    if not boxes then clearMountedTransferPrepare(owner);return false end
+    if not isClient() then
+        for _,box in ipairs(boxes) do
+            if not M.ensureOwnedContainerTransport(player,box.item) then return false end
+        end
+        return true
+    end
+    if #boxes==0 and not state then return true end
+    if not state then
+        mountedTransferSequence=mountedTransferSequence+1
+        state={token=mountedTransferSequence,boxes=boxes,player=player,startedAt=getTimestampMs()}
+        owner.MLO_transportPrepare=state
+        pendingMountedTransferPrepare[state.token]=owner
+        local ids={}
+        for _,box in ipairs(boxes) do ids[#ids+1]=box.item:getID() end
+        local sent=pcall(sendClientCommand,player,M.MODULE,"prepareMountedTransfer",{token=state.token,boxIds=ids})
+        if not sent then clearMountedTransferPrepare(owner);return false end
+        return nil
+    end
+    if state.player~=player or state.rejected or not sameMountedTransferBoxes(state.boxes,boxes)
+        or getTimestampMs()-state.startedAt>10000 then
+        clearMountedTransferPrepare(owner)
+        M.logOnce("mounted-transfer-prepare","mounted container transfer cancelled before native transaction: ownership changed or server preparation unavailable")
+        return false
+    end
+    if not state.ready then return nil end
+    for _,box in ipairs(boxes) do
+        local ok=M.ensureOwnedContainerTransport(player,box.item)
+        if not ok then clearMountedTransferPrepare(owner);return false end
+    end
+    clearMountedTransferPrepare(owner)
+    return true
+end
+M.BoxTransportPrepare={poll=prepareBoxTransport,cancel=clearMountedTransferPrepare}
 local vanillaInventoryTransferWaitToStart=ISInventoryTransferAction.waitToStart
 function ISInventoryTransferAction:waitToStart(...)
     if vanillaInventoryTransferWaitToStart and vanillaInventoryTransferWaitToStart(self,...) then return true end
-    if not isClient() then return false end
-    local state=self.MLO_transportPrepare
-    local boxes=mountedTransferBoxes(self)
-    if #boxes==0 and not state then return false end
-    if not state then
-        mountedTransferSequence=mountedTransferSequence+1
-        state={token=mountedTransferSequence,boxes=boxes,startedAt=getTimestampMs()}
-        self.MLO_transportPrepare=state
-        pendingMountedTransferPrepare[state.token]=self
-        local ids={}
-        for _,box in ipairs(boxes) do ids[#ids+1]=box.item:getID() end
-        sendClientCommand(self.character,M.MODULE,"prepareMountedTransfer",{token=state.token,boxIds=ids})
-        return true
-    end
-    if state.rejected or not sameMountedTransferBoxes(state.boxes,boxes)
-        or getTimestampMs()-state.startedAt>10000 then
-        clearMountedTransferPrepare(self)
-        M.logOnce("mounted-transfer-prepare","mounted container transfer cancelled before native transaction: ownership changed or server preparation unavailable")
-        self:forceStop()
-        return true
-    end
-    if not state.ready then return true end
-    for _,box in ipairs(boxes) do
-        local ok=M.ensureMountedContainerTransport(self.character,box.item)
-        if not ok then clearMountedTransferPrepare(self);self:forceStop();return true end
-    end
-    clearMountedTransferPrepare(self)
-    return false
+    local ready=prepareBoxTransport(self,self.character,mountedTransferBoxes(self))
+    if ready==false then self:forceStop() end
+    return ready~=true
 end
 
 local vanillaInventoryTransferStart = ISInventoryTransferAction.start
@@ -796,8 +808,10 @@ local function projectionRestoreReady(player)
     return true
 end
 
+local clearRootExitForNewMount
 local function requestPersistentMount(player,parent,item,slotId)
     if not player or not parent or not item then return false end
+    clearRootExitForNewMount(player,parent,slotId)
     if isClient() then
         sendClientCommand(player,M.MODULE,"mountItem",{
             parentId=parent:getID(),itemId=item:getID(),slotId=slotId,
@@ -820,7 +834,7 @@ local function requestPersistentUnmount(player,parent,item,slotId)
         -- Vanilla has already detached the local AttachedItem at this point.
         -- Keep the exact durable relation pending until server confirmation so
         -- projection cannot reattach it during the multiplayer response gap.
-        return requestPersistentUnmountById(player,parent,slotId,item:getID())
+        return requestPersistentUnmountById(player,parent,slotId,item:getID(),true)
     end
     local ok=M.unmountItem(player,parent,slotId,item)
     if not ok then return false end
@@ -833,37 +847,53 @@ end
 -- durable relation pending, keyed by the exact child id, so projection cannot
 -- reattach it and a delayed command cannot clear a newer mount.
 local pendingRootExitUnmount={}
+local activeRootExitUnmount={}
+local rootExitSequence=0
 M.ROOT_EXIT_RETRY_BASE_TICKS=30
 M.ROOT_EXIT_RETRY_MAX_TICKS=240
+M.ROOT_EXIT_MAX_ATTEMPTS=5
 local function rootExitUnmountKey(player,parent,slotId,itemId)
     local playerNum=player and player:getPlayerNum() or -1
     return table.concat({playerNum,parent and parent:getID() or "",slotId or "",itemId or ""},":")
 end
 
+local function stopRootExitRetry(player,key,pending,reason)
+    local jobs=activeRootExitUnmount[player:getPlayerNum()]
+    if jobs then
+        jobs[key]=nil
+        local hasJobs=false
+        for _ in pairs(jobs) do hasJobs=true;break end
+        if not hasJobs then activeRootExitUnmount[player:getPlayerNum()]=nil end
+    end
+    if pending then pending.exhausted=true;pending.terminalReason=reason end
+end
+
 local function clearPendingRootExitUnmount(player,parentId,slotId,itemId)
     if not player then return end
     local key=rootExitUnmountKey(player,{getID=function() return parentId end},slotId,itemId)
+    stopRootExitRetry(player,key)
     pendingRootExitUnmount[key]=nil
 end
 
 local function isPendingRootExitItem(player,item,slotId,snapshot)
     if not player or not item then return false end
-    local prefix=tostring(player:getPlayerNum())..":"
-    local itemId=tonumber(item:getID())
-    for key,pending in pairs(pendingRootExitUnmount) do
-        if string.sub(key,1,#prefix)==prefix and pending.itemId==itemId
-            and pending.slotId==slotId then
-            local parent=M.mountedSlotForItem(player,item,snapshot)
-            if parent and tonumber(parent:getID())==pending.parentId then return true end
-        end
-    end
-    return false
+    local parent=M.mountedSlotForItem(player,item,snapshot)
+    return parent and pendingRootExitUnmount[rootExitUnmountKey(player,parent,slotId,item:getID())]~=nil or false
 end
 
 local function clearAllPendingRootExitUnmount(player)
     local prefix=tostring(player and player:getPlayerNum() or -1)..":"
     for key in pairs(pendingRootExitUnmount) do
+        if string.sub(key,1,#prefix)==prefix then pendingRootExitUnmount[key]=nil end
+    end
+    activeRootExitUnmount[player and player:getPlayerNum() or -1]=nil
+end
+
+clearRootExitForNewMount=function(player,parent,slotId)
+    local prefix=rootExitUnmountKey(player,parent,slotId,"")
+    for key,pending in pairs(pendingRootExitUnmount) do
         if string.sub(key,1,#prefix)==prefix then
+            stopRootExitRetry(player,key)
             pendingRootExitUnmount[key]=nil
         end
     end
@@ -875,17 +905,26 @@ local function rootExitRetryDelay(attempts)
 end
 
 local function dispatchPendingRootExitUnmount(player,pending)
-    if not player or not pending or not isClient() then return false end
-    sendClientCommand(player,M.MODULE,"unmountItemById",{
-        parentId=pending.parentId,itemId=pending.itemId,slotId=pending.slotId,
-    })
-    pending.attempts=(tonumber(pending.attempts) or 0)+1
+    if not player or not pending or pending.exhausted or not isClient() then return false end
+    local key=rootExitUnmountKey(player,{getID=function() return pending.parentId end},pending.slotId,pending.itemId)
+    if pending.attempts>=M.ROOT_EXIT_MAX_ATTEMPTS then
+        -- Keep the suppression tombstone; a timeout is not an authoritative unlink.
+        stopRootExitRetry(player,key,pending,"retry-exhausted")
+        return false
+    end
+    pending.attempts=pending.attempts+1
     pending.retryTicks=rootExitRetryDelay(pending.attempts)
-    return true
+    -- Thrown sends also consume an attempt, so a transport fault stays bounded.
+    return pcall(function()
+        sendClientCommand(player,M.MODULE,"unmountItemById",{
+            parentId=pending.parentId,itemId=pending.itemId,slotId=pending.slotId,
+            requestId=pending.requestId,
+        })
+    end)
 end
 
 local function tickPendingRootExitUnmount(player,pending)
-    if not pending or not isClient() then return false end
+    if not pending or pending.exhausted or not isClient() then return false end
     pending.retryTicks=(tonumber(pending.retryTicks) or M.ROOT_EXIT_RETRY_BASE_TICKS)-1
     if pending.retryTicks>0 then return false end
     return dispatchPendingRootExitUnmount(player,pending)
@@ -893,19 +932,23 @@ end
 
 local function tickPendingRootExitUnmounts(player)
     if not player or not isClient() then return end
-    local prefix=tostring(player:getPlayerNum())..":"
-    for key,pending in pairs(pendingRootExitUnmount) do
-        if string.sub(key,1,#prefix)==prefix then tickPendingRootExitUnmount(player,pending) end
-    end
+    -- Exhausted tombstones never participate in the per-tick job scan.
+    local jobs=activeRootExitUnmount[player:getPlayerNum()]
+    for _,pending in pairs(jobs or {}) do tickPendingRootExitUnmount(player,pending) end
 end
 
-requestPersistentUnmountById=function(player,parent,slotId,itemId)
-    if not player or not parent or not slotId or not itemId then return false end
+requestPersistentUnmountById=function(player,parent,slotId,itemId,newAttempt)
+    if not player or not parent or not slotId or not tonumber(itemId) then return false end
     local key=rootExitUnmountKey(player,parent,slotId,itemId)
-    if pendingRootExitUnmount[key] then return true end
-    local pending={parentId=tonumber(parent:getID()),slotId=tostring(slotId),itemId=tonumber(itemId),attempts=0,retryTicks=0}
+    if pendingRootExitUnmount[key] and not newAttempt then return true end
+    rootExitSequence=rootExitSequence+1
+    local pending={parentId=tonumber(parent:getID()),slotId=tostring(slotId),itemId=tonumber(itemId),
+        attempts=0,retryTicks=0,requestId=rootExitSequence}
     pendingRootExitUnmount[key]=pending
     if isClient() then
+        local playerNum=player:getPlayerNum()
+        activeRootExitUnmount[playerNum]=activeRootExitUnmount[playerNum] or {}
+        activeRootExitUnmount[playerNum][key]=pending
         dispatchPendingRootExitUnmount(player,pending)
         markProjectionDirty(player)
         return true
@@ -1837,6 +1880,16 @@ local function syncPersistentMountProjection(player,force)
     -- A real dirty event owns the whole repair pass. Reuse one inventory view
     -- for module presentation, detachable visuals, container discovery and the
     -- Hotbar projection instead of recursively walking the same tree again.
+    local prefix=tostring(playerNum)..":"
+    for key,pending in pairs(pendingRootExitUnmount) do
+        if string.sub(key,1,#prefix)==prefix then
+            local parent=M.findById(player,pending.parentId,snapshot)
+            if parent and M.isParent(parent)
+                and M.getPersistentMountId(parent,pending.slotId)~=pending.itemId then
+                clearPendingRootExitUnmount(player,pending.parentId,pending.slotId,pending.itemId)
+            end
+        end
+    end
     local hintsByParent=attachmentHintsByParent(player,snapshot)
     M.syncInstalledModules(player,true,snapshot)
     M.syncAttachedItems(player,snapshot,nil,hintsByParent)
@@ -1976,7 +2029,7 @@ rootExitRelation=function(player,item)
 end
 
 requestRootExitUnmount=function(player,relation)
-    if relation then requestPersistentUnmountById(player,relation.parent,relation.slotId,relation.itemId) end
+    if relation then requestPersistentUnmountById(player,relation.parent,relation.slotId,relation.itemId,true) end
 end
 
 local function addTooltip(option,text)
@@ -2211,14 +2264,29 @@ end
 -- the client after the original action reaches perform(). Cancellation never
 -- reaches perform(), so queued or failed drops cannot clear the relation.
 local function observeRootExitAction(actionClass)
+    local vanillaWait=actionClass.waitToStart
+    local vanillaCancel=actionClass.forceCancel
     local vanillaStart=actionClass.start
     local vanillaPerform=actionClass.perform
     local vanillaStop=actionClass.stop
+    function actionClass:forceCancel(...)
+        clearMountedTransferPrepare(self)
+        self.MLO_rootExitRelation=nil
+        if vanillaCancel then return vanillaCancel(self,...) end
+    end
+    function actionClass:waitToStart(...)
+        if vanillaWait and vanillaWait(self,...) then return true end
+        local boxes=M.collectOwnedTransportBoxes(self.character,{self.item})
+        local ready=prepareBoxTransport(self,self.character,boxes)
+        if ready==false then self:forceStop() end
+        return ready~=true
+    end
     function actionClass:start(...)
         self.MLO_rootExitRelation=rootExitRelation(self.character,self.item)
         return vanillaStart(self,...)
     end
     function actionClass:perform(...)
+        clearMountedTransferPrepare(self)
         local relation=self.MLO_rootExitRelation
         local result=vanillaPerform(self,...)
         self.MLO_rootExitRelation=nil
@@ -2227,6 +2295,7 @@ local function observeRootExitAction(actionClass)
     end
     if vanillaStop then
         function actionClass:stop(...)
+            clearMountedTransferPrepare(self)
             self.MLO_rootExitRelation=nil
             return vanillaStop(self,...)
         end
@@ -2462,18 +2531,64 @@ if Events.OnClothingUpdated then
     end)
 end
 
+local function resolveCommandPlayer(args)
+    local players={}
+    if type(getSpecificPlayer)=="function" then
+        local count=4 -- Native local player slots, including holes after disconnect.
+        if type(getNumActivePlayers)=="function" then
+            local ok,value=pcall(getNumActivePlayers)
+            if ok and type(value)=="number" then count=math.max(count,value) end
+        end
+        for index=0,count-1 do
+            local ok,player=pcall(getSpecificPlayer,index)
+            if ok and player then players[#players+1]=player end
+        end
+    elseif type(getNumActivePlayers)=="function" and getNumActivePlayers()==1
+        and type(getPlayer)=="function" then
+        players[1]=getPlayer()
+    end
+    if args.playerId==nil then
+        if #players==1 then return players[1] end
+        return nil
+    end
+    local id=tonumber(args.playerId)
+    if not id then return nil end
+    local matched
+    for _,player in ipairs(players) do
+        local ok,onlineId=pcall(function() return player:getOnlineID() end)
+        if ok and tonumber(onlineId)==id then
+            if matched then return nil end
+            matched=player
+        end
+    end
+    return matched
+end
+
+local failureNotices=setmetatable({},{__mode="k"})
+local function showCommandFailure(player,args)
+    local message=M.readMessagePayload(args) or M.message("IGUI_MLO_Error_Generic")
+    local text=M.localize(message)
+    local now=type(getTimestampMs)=="function" and getTimestampMs() or nil
+    local last=failureNotices[player]
+    if last and last.text==text and (not now or (now-last.time>=0 and now-last.time<1500)) then return end
+    failureNotices[player]={text=text,time=now or 0}
+    if HaloTextHelper and type(HaloTextHelper.addBadText)=="function" then
+        HaloTextHelper.addBadText(player,text)
+    elseif player.Say then player:Say(text) end
+end
+
 local function onServerCommand(module,command,args)
     if module~=M.MODULE or not args then return end
     if command=="mountedTransferPrepared" then
-        local action=pendingMountedTransferPrepare[tonumber(args.token)]
-        if action and action.character:getOnlineID()==tonumber(args.playerId) then
-            local state=action.MLO_transportPrepare
+        local owner=pendingMountedTransferPrepare[tonumber(args.token)]
+        local state=owner and owner.MLO_transportPrepare
+        if state and state.player:getOnlineID()==tonumber(args.playerId) then
             state.ready=args.ok==true
             state.rejected=args.ok~=true
         end
         return
     end
-    local player=getPlayer()
+    local player=resolveCommandPlayer(args)
     if not player then return end
 
     if command=="serverReady" then
@@ -2504,6 +2619,7 @@ local function onServerCommand(module,command,args)
     end
 
     if command=="failed" then
+        showCommandFailure(player,args)
         markProjectionDirty(player)
         return
     end
@@ -2514,9 +2630,17 @@ local function onServerCommand(module,command,args)
     end
 
     if command=="rootExitUnmountAck" then
+        local parentId,itemId=tonumber(args.parentId),tonumber(args.itemId)
+        local slotId=tostring(args.slotId or "")
+        if not parentId or not itemId then return end
+        local key=rootExitUnmountKey(player,{getID=function() return parentId end},slotId,itemId)
+        local pending=pendingRootExitUnmount[key]
+        if not pending or pending.requestId~=tonumber(args.requestId) then return end
         if args.resolved==true then
-            clearPendingRootExitUnmount(player,args.parentId,tostring(args.slotId or ""),tonumber(args.itemId))
+            clearPendingRootExitUnmount(player,parentId,slotId,itemId)
             markProjectionDirty(player)
+        elseif args.terminal==true then
+            stopRootExitRetry(player,key,pending,tostring(args.reason or "server-terminal"))
         end
         return
     end
@@ -2529,4 +2653,16 @@ local function onServerCommand(module,command,args)
 end
 Events.OnServerCommand.Add(onServerCommand)
 
+require "mercenaryloadout/mlo_pocket_transport_client"
+if M.PocketTransport then
+    M.PocketTransport.installShared()
+    M.PocketTransport.installClient()
+    M.PocketTransport.onFailure=function(player,reason)
+        local key=(reason=="group-container-full" or reason=="group-floor-full")
+            and "IGUI_MLO_Error_ContainerTooFull" or "IGUI_MLO_Error_TransferContent"
+        showCommandFailure(player,M.writeMessagePayload({},M.message(key)))
+    end
+end
+
+require "mercenaryloadout/mlo_box_trade_client"
 print("[MercenaryLoadout] client loaded "..M.VERSION.." build "..tostring(M.BUILD or 0))

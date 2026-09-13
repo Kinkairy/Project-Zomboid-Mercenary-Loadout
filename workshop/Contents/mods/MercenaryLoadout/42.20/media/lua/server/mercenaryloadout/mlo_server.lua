@@ -12,18 +12,18 @@ local function playerKey(player)
 end
 
 local function fail(player,message)
-    sendServerCommand(player,M.MODULE,"failed",M.writeMessagePayload({},message or M.message("IGUI_MLO_Error_Generic")))
+    M.sendPlayerCommand(player,"failed",M.writeMessagePayload({},message or M.message("IGUI_MLO_Error_Generic")))
 end
 
-local function rootExitUnmountAck(player,parentId,slotId,itemId,message,resolved,currentItemId)
-    local data={parentId=parentId,slotId=slotId,itemId=itemId,resolved=resolved==true,currentItemId=currentItemId}
-    sendServerCommand(player,M.MODULE,"rootExitUnmountAck",M.writeMessagePayload(data,message))
+local function rootExitUnmountAck(player,parentId,slotId,itemId,message,resolved,currentItemId,requestId,terminal,reason)
+    local data={parentId=parentId,slotId=slotId,itemId=itemId,resolved=resolved==true,currentItemId=currentItemId,requestId=tonumber(requestId),terminal=terminal==true,reason=reason}
+    M.sendPlayerCommand(player,"rootExitUnmountAck",M.writeMessagePayload(data,message))
 end
 
 local function stateChanged(player,parent,message)
     if not parent then fail(player,M.message("IGUI_MLO_Error_SyncState")) return false end
     local data=M.writeMessagePayload({itemId=parent:getID(),version=M.VERSION},message)
-    sendServerCommand(player,M.MODULE,"stateChanged",data)
+    M.sendPlayerCommand(player,"stateChanged",data)
     return true
 end
 
@@ -77,7 +77,7 @@ end
 local function migrateAndReady(player,cause)
     if not M.reconcileComponents(player) then return false end
     if not migratePlayerOnce(player,cause) then return false end
-    sendServerCommand(player,M.MODULE,"serverReady",{version=M.VERSION,build=M.BUILD})
+    M.sendPlayerCommand(player,"serverReady",{version=M.VERSION,build=M.BUILD})
     return true
 end
 
@@ -94,27 +94,57 @@ local function onClientCommand(module,command,player,args)
 
     if command=="prepareMountedTransfer" then
         local ids=args.boxIds
-        local ok=type(ids)=="table" and #ids>0 and #ids<=2
+        local root=player:getInventory()
+        local rootItems=root:getItems()
+        local limit=M.CONTAINER_TRANSPORT_LIMIT
+        local ok=type(ids)=="table" and #ids>0 and #ids<=limit
+        local requested,found={},{}
+        if ok then
+            local count=0
+            for key in pairs(ids) do
+                count=count+1
+                if count>limit or type(key)~="number" or key%1~=0 or key<1 or key>#ids then
+                    ok=false;break
+                end
+            end
+            if count~=#ids then ok=false end
+        end
         if ok then
             for _,id in ipairs(ids) do
-                local item
-                local matches=0
-                local rootItems=player:getInventory():getItems()
-                for index=0,rootItems:size()-1 do
-                    local candidate=rootItems:get(index)
-                    if candidate:getID()==tonumber(id) then item=candidate;matches=matches+1 end
+                id=tonumber(id)
+                if not id or id~=id or id%1~=0 or requested[id] then ok=false;break end
+                requested[id]=true
+            end
+        end
+        if ok then
+            -- One bounded traversal of the player's own inventory. Reuse the
+            -- shared collector's exact ownership/backref/cycle/ID validation;
+            -- descendants of an offered ordinary bag need the same repair.
+            local roots={}
+            if rootItems:size()>limit then ok=false
+            else
+                for index=0,rootItems:size()-1 do roots[#roots+1]=rootItems:get(index) end
+                local boxes=M.collectOwnedTransportBoxes(player,roots)
+                if not boxes then ok=false
+                else
+                    for _,box in ipairs(boxes) do found[tonumber(box.item:getID())]=box.item end
                 end
-                if matches~=1 then ok=false;break end
-                local parent,slot=M.findPersistentMountParent(player,item)
-                if not item or not parent or item:getContainer()~=player:getInventory()
-                    or (slot~=M.MODULE_SLOT.packMedBox and slot~=M.MODULE_SLOT.packToolbox)
-                    or not M.ensureMountedContainerTransport(player,item) then
+            end
+        end
+        if ok then
+            -- Pointer changes remain reversible until all requested boxes pass.
+            -- No item/content/network publication belongs to this preparation.
+            local tx=M.newTransaction(player)
+            for _,id in ipairs(ids) do
+                local item=found[tonumber(id)]
+                if not item or not M.ensureOwnedContainerTransport(player,item,tx) then
                     ok=false
                     break
                 end
             end
+            if not ok then M.rollbackTransaction(tx) end
         end
-        sendServerCommand(player,M.MODULE,"mountedTransferPrepared",{
+        M.sendPlayerCommand(player,"mountedTransferPrepared",{
             token=tonumber(args.token),playerId=player:getOnlineID(),ok=ok,
         })
         return
@@ -159,17 +189,17 @@ local function onClientCommand(module,command,player,args)
         local expectedItemId=tonumber(args.itemId)
         if not parent or not expectedItemId or not M.isParent(parent)
             or not M.slotBelongsToGroup(slotId,M.groupOf(parent)) then
-            rootExitUnmountAck(player,args.parentId,slotId,expectedItemId,M.message("IGUI_MLO_Error_AttachmentMissing"),false,nil)
+            rootExitUnmountAck(player,args.parentId,slotId,expectedItemId,M.message("IGUI_MLO_Error_AttachmentMissing"),false,nil,args.requestId,true,"invalid-relation")
             return
         end
         local removed,removeReason=M.unmountItemById(player,parent,slotId,expectedItemId)
         if not removed then
             local current=M.getPersistentMountId(parent,slotId)
-            rootExitUnmountAck(player,parent:getID(),slotId,expectedItemId,removeReason,current~=expectedItemId,current)
+            rootExitUnmountAck(player,parent:getID(),slotId,expectedItemId,removeReason,current~=expectedItemId,current,args.requestId,current~=expectedItemId,current~=expectedItemId and "relation-resolved" or "retryable-failure")
             return
         end
         stateChanged(player,parent,M.message("IGUI_MLO_Status_Detached"))
-        rootExitUnmountAck(player,parent:getID(),slotId,expectedItemId,nil,true,M.getPersistentMountId(parent,slotId))
+        rootExitUnmountAck(player,parent:getID(),slotId,expectedItemId,nil,true,M.getPersistentMountId(parent,slotId),args.requestId,true,"relation-resolved")
         return
     end
 
@@ -178,6 +208,7 @@ Events.OnClientCommand.Add(onClientCommand)
 
 local function clearPlayerState(player)
     migratedPlayers[player]=nil
+    if M.clearTransactionPublications then M.clearTransactionPublications(player) end
     M.clearComponentPlayerState(player)
     M.clearPouchPlayerState(player)
 end
@@ -190,6 +221,7 @@ addServerEvent("EveryOneMinute",function()
     local players = getOnlinePlayers()
     for index = 0, players:size()-1 do
         local player = players:get(index)
+        if M.flushTransactionPublications then M.flushTransactionPublications(player) end
         if pouchReductionChanged then M.syncFixedPouchWeights(player) end
         if changed then M.reconcileComponents(player)
         else M.flushComponentPublications(player, false) end
@@ -202,5 +234,15 @@ addServerEvent("OnPlayerConnect",function(player) migrateAndReady(player,"connec
 addServerEvent("OnPlayerConnected",function(player) migrateAndReady(player,"connected") end)
 addServerEvent("OnPlayerDisconnect",clearPlayerState)
 addServerEvent("OnPlayerDisconnected",clearPlayerState)
+
+require "mercenaryloadout/mlo_pocket_transport"
+if M.PocketTransport then
+    M.PocketTransport.installShared()
+    M.PocketTransport.onFailure=function(player,reason)
+        local key=(reason=="group-container-full" or reason=="group-floor-full")
+            and "IGUI_MLO_Error_ContainerTooFull" or "IGUI_MLO_Error_TransferContent"
+        M.sendPlayerCommand(player,"failed",M.writeMessagePayload({},M.message(key)))
+    end
+end
 
 print("[MercenaryLoadout] server loaded "..M.VERSION.." build "..tostring(M.BUILD or 0))
