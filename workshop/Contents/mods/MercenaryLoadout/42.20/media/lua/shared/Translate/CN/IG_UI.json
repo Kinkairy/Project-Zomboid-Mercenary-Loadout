@@ -198,5 +198,8 @@
   "IGUI_HotbarAttachment_MLO_Greave_KnifeR": "护胫刀鞘",
   "IGUI_HotbarAttachment_MLO_Pack_PlushToy": "玩偶挂扣",
   "IGUI_MLO_Slot_PackPlushToy": "玩偶挂扣",
-  "IGUI_MLO_Upgrade_PackPlushToy": "安装玩偶挂扣"
+  "IGUI_MLO_Upgrade_PackPlushToy": "安装玩偶挂扣",
+  "IGUI_MLO_Radial_WearMask": "戴上面罩：%1",
+  "IGUI_MLO_Radial_RemoveMask": "脱下面罩：%1",
+  "IGUI_MLO_Error_TransportPreparation": "容器转移准备失败。请确认物品仍属于你，且客户端与服务器的 Mod 版本一致，然后重试。"
 }

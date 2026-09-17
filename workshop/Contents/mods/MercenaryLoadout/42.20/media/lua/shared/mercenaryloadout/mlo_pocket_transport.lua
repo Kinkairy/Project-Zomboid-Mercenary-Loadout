@@ -188,7 +188,7 @@ end
 
 function T.reject(character, reason)
     T.lastError = tostring(reason)
-    if M.logOnce then M.logOnce("pocket-transport:" .. T.lastError, "Pocket transfer retained original items: " .. T.lastError) end
+    if M.logOnce then M.logOnce("pocket-transport:" .. T.lastError, "Pocket transfer rejected/interrupted; no compensating item created: " .. T.lastError) end
     if T.onFailure then T.onFailure(character, T.lastError) end
 end
 
@@ -228,7 +228,22 @@ function T.installShared()
         if not ok then T.reject(character, err); return item end
         local result
         for _, member in ipairs(plan.items) do
-            local moved = transfer(self, character, member, src, dst, plan.square or square)
+            local ran,moved = pcall(transfer,self,character,member,src,dst,plan.square or square)
+            if not ran then
+                T.reject(character,"native-group-interrupted")
+                error(moved,0)
+            end
+            local arrived=member:getContainer()==dst
+            if dst:getType()=="floor" then
+                local world=member:getWorldItem()
+                arrived=world~=nil and world:getSquare()==(plan.square or square)
+            end
+            if moved==false or not arrived then
+                -- Never advance the remaining hidden companions after a native
+                -- rejection. Do not clone items or pretend published moves rolled back.
+                T.reject(character,"native-group-interrupted")
+                return result or item
+            end
             if member == item then result = moved end
         end
         return result
@@ -267,7 +282,13 @@ function T.installShared()
                 self.item = parentItem
                 -- Native placement has already mutated state; do not replay or
                 -- invent a compensating item on an unproven rollback path.
+                T.reject(self.character,"native-group-interrupted")
                 error(value)
+            end
+            if value==false then
+                self.item=parentItem
+                T.reject(self.character,"native-group-interrupted")
+                return false
             end
             if member == parentItem then result = value end
         end

@@ -4,8 +4,9 @@ MercenaryAcceptItemFunction = MercenaryAcceptItemFunction or {}
 require "NPCs/BodyLocations"
 
 local M = MercenaryLoadout
-M.VERSION = "RC1.3.3"
-M.BUILD = 25
+M.VERSION = "RC1.3.4"
+M.BUILD = 26
+M.DEBUG_TRANSFER_TRACE = false
 M.MODULE = "MercenaryLoadout"
 
 M.TYPE = {
@@ -1665,9 +1666,9 @@ function M.itemUses(item)
     return 1
 end
 
-function M.countUnits(player, ft)
+function M.countUnits(player, ft, snapshot)
     local total = 0
-    for _, item in ipairs(M.allRecursiveItems(player)) do
+    for _, item in ipairs(snapshot and snapshot.items or M.allRecursiveItems(player)) do
         if M.fullType(item) == ft and not M.isModuleItem(item) then
             total = total + M.itemUses(item)
         end
@@ -1675,8 +1676,8 @@ function M.countUnits(player, ft)
     return total
 end
 
-function M.findFirst(player, typeSet, predicate)
-    for _, item in ipairs(M.allRecursiveItems(player)) do
+function M.findFirst(player, typeSet, predicate, snapshot)
+    for _, item in ipairs(snapshot and snapshot.items or M.allRecursiveItems(player)) do
         if (not typeSet or typeSet[M.fullType(item)]) and not M.isModuleItem(item) then
             if not predicate or predicate(item) then
                 return item
@@ -1730,7 +1731,7 @@ function M.sourceRequirements(def)
     return {}
 end
 
-function M.getSourceForRequirement(player, requirement, excluded)
+function M.getSourceForRequirement(player, requirement, excluded, snapshot)
     local def = requirement or {}
     local set = nil
     if def.sourceSet then set = M.TYPE[def.sourceSet] end
@@ -1748,13 +1749,14 @@ function M.getSourceForRequirement(player, requirement, excluded)
         if def.sourceEmpty and not M.containerEmpty(item) then return false end
         if def.sourceMagazineOnly and not M.sourceValidForMagazinePanel(item) then return false end
         return true
-    end)
+    end, snapshot)
 end
 
-function M.getSourcesForUpgrade(player, def)
+function M.getSourcesForUpgrade(player, def, snapshot)
+    snapshot = snapshot or M.inventorySnapshot(player)
     local sources, excluded = {}, {}
     for _, requirement in ipairs(M.sourceRequirements(def)) do
-        local source = M.getSourceForRequirement(player, requirement, excluded)
+        local source = M.getSourceForRequirement(player, requirement, excluded, snapshot)
         if not source then return nil, requirement, sources end
         sources[#sources + 1] = source
         excluded[source] = true
@@ -1778,7 +1780,7 @@ function M.upgradeParentEligible(parent, key)
     return not allowed or allowed[M.fullType(parent)] == true
 end
 
-function M.checkUpgrade(player, parent, key)
+function M.checkUpgrade(player, parent, key, snapshot)
     local def = M.UPGRADES[key]
     if not def then return false, M.message("IGUI_MLO_Error_UnknownUpgrade") end
     if not player or not parent then return false, M.message("IGUI_MLO_Error_EquipmentMissing") end
@@ -1797,8 +1799,9 @@ function M.checkUpgrade(player, parent, key)
             M.textArgument("IGUI_perks_Tailoring"), requiredTailoring)
     end
 
+    snapshot = snapshot or M.inventorySnapshot(player)
     for ft, amount in pairs(def.materials or {}) do
-        if M.countUnits(player, ft) < amount then
+        if M.countUnits(player, ft, snapshot) < amount then
             return false, M.message("IGUI_MLO_Error_MissingMaterial", M.itemArgument(ft), amount)
         end
     end
@@ -1806,13 +1809,13 @@ function M.checkUpgrade(player, parent, key)
     for _, ft in ipairs(def.tools or {}) do
         local found = M.findFirst(player, {[ft]=true}, function(item)
             return not safeCall(function() return item:isBroken() end, false)
-        end)
+        end, snapshot)
         if not found then return false, M.message("IGUI_MLO_Error_MissingTool", M.itemArgument(ft)) end
     end
 
     local sourceRequirements = M.sourceRequirements(def)
     if #sourceRequirements > 0 then
-        local sources, missingRequirement = M.getSourcesForUpgrade(player, def)
+        local sources, missingRequirement = M.getSourcesForUpgrade(player, def, snapshot)
         if not sources then
             local missing = missingRequirement or def
             if missing.missingKey then
@@ -4244,7 +4247,8 @@ function M.applyUpgrade(player, parent, key)
     local ok, reason = M.checkUpgrade(player, parent, key)
     if not ok then return false, reason end
     local def = M.UPGRADES[key]
-    local sources, missingRequirement = M.getSourcesForUpgrade(player, def)
+    local snapshot = M.inventorySnapshot(player)
+    local sources, missingRequirement = M.getSourcesForUpgrade(player, def, snapshot)
     if not sources then
         return false, M.message((missingRequirement and missingRequirement.missingKey)
             or "IGUI_MLO_Error_PartRequired")

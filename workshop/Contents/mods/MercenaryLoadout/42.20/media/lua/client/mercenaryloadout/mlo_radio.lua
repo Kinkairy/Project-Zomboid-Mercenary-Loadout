@@ -44,7 +44,7 @@ local function updatePrivateMedia(data)
     if not ok then error(reason) end
 end
 
-local function upkeep(item, data, state, minute)
+local function upkeepPower(item, data, state, minute)
     -- Native Radio resumes its own battery tick when taken into a hand. Advance
     -- its minute stamp too, or it would charge the mounted interval a second time.
     -- setInitialPower is the public stamp setter; restore its power-only side
@@ -75,12 +75,32 @@ local function upkeep(item, data, state, minute)
         data:setIsTurnedOn(false)
         return
     end
+end
+
+local function upkeepMedia(item, data, state)
     local receiving = not data:isNoTransmit() and not data:isPlayingMedia()
     if not isClient() and receiving and not state.registered then
         getZomboidRadio():RegisterDevice(item)
         state.registered = true
     elseif not receiving then unregister(state, item) end
     if data:getDeviceVolume() > 0 and data:hasMedia() then updatePrivateMedia(data) end
+end
+
+-- A failure in one branch must not permanently disable unrelated upkeep.
+-- One initial attempt plus four retries, at 1/2/4/8 seconds. A successful
+-- retry clears its budget; toggling off/re-equipping resets the device state.
+local function runUpkeepPhase(item, state, name, now, callback)
+    local retry=state[name]
+    if retry and (retry.exhausted or now<retry.nextAt) then return end
+    local ok,reason=pcall(callback)
+    if ok then state[name]=nil;return end
+    retry=retry or {failures=0}
+    retry.failures=retry.failures+1
+    retry.nextAt=now+1000*2^(retry.failures-1)
+    retry.exhausted=retry.failures>=5
+    state[name]=retry
+    M.logOnce("mounted-"..name..":"..tostring(item:getID())..":"..retry.failures,
+        "mounted radio "..name.." failed; "..(retry.exhausted and "retry limit reached" or "retry scheduled")..": "..tostring(reason))
 end
 
 function M.tickMountedRadioPlayback(player)
@@ -115,12 +135,14 @@ function M.tickMountedRadioPlayback(player)
                 end
                 if not state.seen then
                     state.seen = true
-                    if not state.failed then
-                        local ok, reason = pcall(upkeep, item, data, state, minute)
-                        if not ok then
-                            state.failed = true
-                            M.logOnce("mounted-media:" .. tostring(item:getID()), "mounted subtitle update failed: " .. tostring(reason))
-                        end
+                    local now=getTimestampMs()
+                    runUpkeepPhase(item,state,"power",now,function()
+                        upkeepPower(item,data,state,minute)
+                    end)
+                    if data:getIsTurnedOn() then
+                        runUpkeepPhase(item,state,"media",now,function()
+                            upkeepMedia(item,data,state)
+                        end)
                     end
                 end
             end

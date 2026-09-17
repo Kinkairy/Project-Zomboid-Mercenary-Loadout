@@ -198,5 +198,8 @@
   "IGUI_HotbarAttachment_MLO_Greave_KnifeR": "Greave Sheath",
   "IGUI_HotbarAttachment_MLO_Pack_PlushToy": "Plush Toy Hook",
   "IGUI_MLO_Slot_PackPlushToy": "Plush Toy Hook",
-  "IGUI_MLO_Upgrade_PackPlushToy": "Install Plush Toy Hook"
+  "IGUI_MLO_Upgrade_PackPlushToy": "Install Plush Toy Hook",
+  "IGUI_MLO_Radial_WearMask": "Wear mask: %1",
+  "IGUI_MLO_Radial_RemoveMask": "Remove mask: %1",
+  "IGUI_MLO_Error_TransportPreparation": "Container transfer preparation failed. Check that the item is still yours and both sides use the same Mod version, then retry."
 }

@@ -19,8 +19,10 @@ require "RadioCom/ISRadioWindow"
 require "mercenaryloadout/mlo_shared"
 require "mercenaryloadout/mlo_actions"
 require "mercenaryloadout/mlo_radio"
+require "mercenaryloadout/mlo_mask_radial"
 
 local M = MercenaryLoadout
+require "mercenaryloadout/mlo_transport_scope"
 
 -- Preserve the stock pane's grouping, transfer and context-menu ownership.
 -- Immediately before vanilla groups the current visible container, repair
@@ -117,6 +119,7 @@ local pendingInventoryMutation = {}
 local pendingContainerTransferTrace = {}
 local containerTransferTraceLines = 0
 local function traceContainerTransfer(action, phase, items)
+    if M.DEBUG_TRANSFER_TRACE ~= true then return false end
     if containerTransferTraceLines >= 96 then return false end
     local ok, traced = pcall(function()
         local source, target = action.srcContainer, action.destContainer
@@ -309,9 +312,16 @@ local function prepareBoxTransport(owner,player,boxes)
         state={token=mountedTransferSequence,boxes=boxes,player=player,startedAt=getTimestampMs()}
         owner.MLO_transportPrepare=state
         pendingMountedTransferPrepare[state.token]=owner
-        local ids={}
-        for _,box in ipairs(boxes) do ids[#ids+1]=box.item:getID() end
-        local sent=pcall(sendClientCommand,player,M.MODULE,"prepareMountedTransfer",{token=state.token,boxIds=ids})
+        local ids,paths={},{}
+        for _,box in ipairs(boxes) do
+            local path=M.transportPathForItem(player,box.item)
+            if not path then clearMountedTransferPrepare(owner);return false end
+            ids[#ids+1]=box.item:getID()
+            paths[#paths+1]=path
+        end
+        local sent=pcall(sendClientCommand,player,M.MODULE,"prepareMountedTransfer",{
+            token=state.token,boxIds=ids,boxPaths=paths,
+        })
         if not sent then clearMountedTransferPrepare(owner);return false end
         return nil
     end
@@ -329,12 +339,22 @@ local function prepareBoxTransport(owner,player,boxes)
     clearMountedTransferPrepare(owner)
     return true
 end
+local function reportTransportPreparationFailure(owner,player)
+    if owner.MLO_transportFailureShown then return end
+    owner.MLO_transportFailureShown=true
+    local text=M.text("IGUI_MLO_Error_TransportPreparation")
+    if HaloTextHelper and HaloTextHelper.addBadText then HaloTextHelper.addBadText(player,text)
+    elseif player and player.Say then player:Say(text) end
+end
 M.BoxTransportPrepare={poll=prepareBoxTransport,cancel=clearMountedTransferPrepare}
 local vanillaInventoryTransferWaitToStart=ISInventoryTransferAction.waitToStart
 function ISInventoryTransferAction:waitToStart(...)
     if vanillaInventoryTransferWaitToStart and vanillaInventoryTransferWaitToStart(self,...) then return true end
     local ready=prepareBoxTransport(self,self.character,mountedTransferBoxes(self))
-    if ready==false then self:forceStop() end
+    if ready==false then
+        reportTransportPreparationFailure(self,self.character)
+        self:forceStop()
+    end
     return ready~=true
 end
 
@@ -1383,7 +1403,7 @@ function ISHotbar:activateSlot(slotIndex)
     local slotId=slot and mloSlotIdFromDefinition(slot.def) or nil
     if activatePortableRadio(self, item, slotIndex, slot) then return end
     if item and slotId=="MLO_Pack_WeldingMask" and M.isCompatible(slotId,item) then
-        if self.chr:isEquipped(item) then
+        if self.chr:isEquippedClothing(item) then
             ISTimedActionQueue.add(ISUnequipAction:new(self.chr,item,50))
         else
             ISTimedActionQueue.add(ISWearClothing:new(self.chr,item,50))
@@ -1455,6 +1475,7 @@ ISDPadWheels.onDisplayLeft=function(joypadData)
     local menu=getPlayerRadialMenu(playerIndex)
     if not player or not hotbar or not menu then return result end
     addMissingMountedLightSlices(player, hotbar, menu)
+    M.addMaskRadialSlice(player, hotbar, menu)
     for slotIndex,slot in ipairs(hotbar.availableSlot or {}) do
         local item=hotbar.attachedItems and hotbar.attachedItems[slotIndex] or nil
         if item and instanceof(item,"Radio") and item:getAttachedSlot()==slotIndex
@@ -2069,7 +2090,7 @@ local function sourceRequirementName(player, def, source)
     return nil
 end
 
-local function describeRequirementState(player, def)
+local function describeRequirementState(player, def, snapshot)
     local lines = {}
     local requiredTailoring = tonumber(def.tailoring) or 0
     if requiredTailoring > 0 then
@@ -2083,14 +2104,14 @@ local function describeRequirementState(player, def)
     table.sort(materialTypes)
     for _, fullType in ipairs(materialTypes) do
         local required = tonumber(def.materials[fullType]) or 0
-        local current = math.min(M.countUnits(player, fullType), required)
+        local current = math.min(M.countUnits(player, fullType, snapshot), required)
         lines[#lines + 1] = requirementLine(current >= required,
             getItemNameFromFullType(fullType) .. " " .. current .. "/" .. required)
     end
 
     local excludedSources = {}
     for _, requirement in ipairs(M.sourceRequirements(def)) do
-        local source = M.getSourceForRequirement(player, requirement, excludedSources)
+        local source = M.getSourceForRequirement(player, requirement, excludedSources, snapshot)
         local found = source ~= nil
         if source then excludedSources[source] = true end
         lines[#lines + 1] = requirementLine(found,
@@ -2100,7 +2121,7 @@ local function describeRequirementState(player, def)
     for _, fullType in ipairs(def.tools or {}) do
         local found = M.findFirst(player, {[fullType] = true}, function(item)
             return not item:isBroken()
-        end) ~= nil
+        end, snapshot) ~= nil
         lines[#lines + 1] = requirementLine(found,
             getItemNameFromFullType(fullType) .. " " .. (found and "1/1" or "0/1"))
     end
@@ -2111,6 +2132,7 @@ local function addUpgradeMenu(player,context,parent)
     local group = M.groupOf(parent)
     local order = M.UPGRADE_ORDER[group]
     if not order then return end
+    local snapshot = M.inventorySnapshot(player)
 
     local sub = ISContextMenu:getNew(context)
     local anything=false
@@ -2132,11 +2154,11 @@ local function addUpgradeMenu(player,context,parent)
                 end
                 ISTimedActionQueue.add(action)
             end)
-            local ok,reason=M.checkUpgrade(player,parent,key)
+            local ok,reason=M.checkUpgrade(player,parent,key,snapshot)
             if not ok then
                 opt.notAvailable=true
             end
-            addTooltip(opt,describeRequirementState(player,def))
+            addTooltip(opt,describeRequirementState(player,def,snapshot))
             anything=true
         end
     end
@@ -2191,7 +2213,7 @@ local vanillaBackpackRightMouseDown=ISInventoryPage.onBackpackRightMouseDown
 function ISInventoryPage.onBackpackRightMouseDown(button,x,y)
     local container=button and button.inventory or nil
     local item=container and container:getContainingItem() or nil
-    if not M.isFixedPouchItem(item) then
+    if not M.isFixedPouchItem(item) or M.isDetachedPouch(item) then
         return vanillaBackpackRightMouseDown(button,x,y)
     end
 
@@ -2278,7 +2300,10 @@ local function observeRootExitAction(actionClass)
         if vanillaWait and vanillaWait(self,...) then return true end
         local boxes=M.collectOwnedTransportBoxes(self.character,{self.item})
         local ready=prepareBoxTransport(self,self.character,boxes)
-        if ready==false then self:forceStop() end
+        if ready==false then
+            reportTransportPreparationFailure(self,self.character)
+            self:forceStop()
+        end
         return ready~=true
     end
     function actionClass:start(...)
@@ -2427,7 +2452,7 @@ local function onFillInventoryObjectContextMenu(playerIndex,context,items)
     -- vanilla batch action may move the inseparable child as a side effect.
     for _,entry in ipairs(items) do
         local selected=unwrap(entry)
-        if selected and M.isFixedPouchItem(selected) then
+        if selected and M.isFixedPouchItem(selected) and not M.isDetachedPouch(selected) then
             clearInstalledModuleMenu(context)
             return
         end

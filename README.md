@@ -1,5 +1,13 @@
 # Mercenary Loadout / 雇佣兵战术套装
 
+## 1.3.4 面罩快捷轮盘 / Quick mask wheel
+
+穿戴已升级面罩挂位的战术背包，并把兼容面罩挂到该位置。打开手柄**左方向键轮盘**，选择“戴上面罩”或“脱下面罩”。标签随真实穿戴状态变化；轮盘打开后若更换面罩、转移物品或卸下背包，旧选项不会操作替代物品。键鼠仍可使用现有面罩快捷槽。原版穿脱动作、物品 ID、滤芯、防护属性与挂位关系不作替换。
+
+Wear the upgraded pack and attach a supported mask to its mask slot. Open the **D-pad-left utility wheel** and select Wear mask or Remove mask. The callback revalidates the exact item, parent and worn state. Keyboard/mouse players retain the existing mask hotbar toggle. Native actions and original protection/filter state remain unchanged.
+
+1.3.4 的源码与隔离测试不等于实机验收。部署入口和测试范围见 `deploy/1.3.4/README.md` 与 `docs/release-1.3.4/README.md`。
+
 ## 雇佣兵战术套装
 
 > 将原版背包、爱丽丝背带、皮带和军用护具逐件升级，打造自己的战术携行套装。
@@ -66,7 +74,7 @@
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.3
+**Version:** 1.3.4
 
 ---
 
@@ -128,7 +136,7 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.3
+**Version:** 1.3.4
 
 ## License / 许可证
 

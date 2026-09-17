@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.4
+
+- 修复已分离口袋的右键菜单、缩小工具箱转移校验范围。
+- 升级菜单复用单次库存快照；默认关闭临时转移追踪。
+- 挂载电台电量与媒体维护分离，异常后进行有上限的重试。
+- 手柄左方向轮盘增加面罩穿脱，复用原生动作与原始物品。
+- 原生组内转移失败时停止后续成员；不宣称原生转移具备原子性。
+
+Fixed detached-pouch menus and selected-box transport scope; reuse menu snapshots; disable temporary trace by default; isolate radio upkeep failures with bounded recovery; add a D-pad-left wear/remove mask slice; stop remaining native group members on failure without compensating item creation.
+
 ## 1.3.3
 
 1.3.3：改善性能。 / Improved performance.

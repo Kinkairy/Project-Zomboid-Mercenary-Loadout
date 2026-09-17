@@ -1,6 +1,7 @@
 require "mercenaryloadout/mlo_shared"
 require "mercenaryloadout/mlo_actions"
 local M=MercenaryLoadout
+require "mercenaryloadout/mlo_transport_scope"
 
 M.registerAttachedLocations()
 M.registerBodyLocations()
@@ -94,9 +95,8 @@ local function onClientCommand(module,command,player,args)
 
     if command=="prepareMountedTransfer" then
         local ids=args.boxIds
-        local root=player:getInventory()
-        local rootItems=root:getItems()
         local limit=M.CONTAINER_TRANSPORT_LIMIT
+        local reason="invalid-selection"
         local ok=type(ids)=="table" and #ids>0 and #ids<=limit
         local requested,found={},{}
         if ok then
@@ -117,14 +117,14 @@ local function onClientCommand(module,command,player,args)
             end
         end
         if ok then
-            -- One bounded traversal of the player's own inventory. Reuse the
-            -- shared collector's exact ownership/backref/cycle/ID validation;
-            -- descendants of an offered ordinary bag need the same repair.
-            local roots={}
-            if rootItems:size()>limit then ok=false
+            -- Resolve client hints through the player's real root and each
+            -- exact ownership edge. Never validate unrelated bag descendants.
+            local roots
+            roots,reason=M.resolveTransportPaths(player,ids,args.boxPaths)
+            if not roots then ok=false
             else
-                for index=0,rootItems:size()-1 do roots[#roots+1]=rootItems:get(index) end
-                local boxes=M.collectOwnedTransportBoxes(player,roots)
+                local boxes
+                boxes,reason=M.collectOwnedTransportBoxes(player,roots)
                 if not boxes then ok=false
                 else
                     for _,box in ipairs(boxes) do found[tonumber(box.item:getID())]=box.item end
@@ -138,6 +138,7 @@ local function onClientCommand(module,command,player,args)
             for _,id in ipairs(ids) do
                 local item=found[tonumber(id)]
                 if not item or not M.ensureOwnedContainerTransport(player,item,tx) then
+                    reason="ownership-changed"
                     ok=false
                     break
                 end
@@ -145,7 +146,7 @@ local function onClientCommand(module,command,player,args)
             if not ok then M.rollbackTransaction(tx) end
         end
         M.sendPlayerCommand(player,"mountedTransferPrepared",{
-            token=tonumber(args.token),playerId=player:getOnlineID(),ok=ok,
+            token=tonumber(args.token),playerId=player:getOnlineID(),ok=ok,reason=not ok and reason or nil,
         })
         return
     end
