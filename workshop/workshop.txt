@@ -1,6 +1,6 @@
 version=1
 id=3794244437
-title=雇佣兵战术套装 / Mercenary Tactical Loadout
+title=Mercenary Tactical Loadout
 description=[h1]雇佣兵战术套装 / Mercenary Tactical Loadout[/h1]
 description=
 description=升级原版背包、爱丽丝背带、皮带与军用护具，增加 [b]17 个挂载位、13 个独立口袋（合计容量81）和1个钥匙容器（容量10）[/b]。独立格子方便分类存放工具、医疗用品和弹药；挂载箱包另有原本的容量。
