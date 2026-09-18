@@ -1,5 +1,10 @@
 # Mercenary Loadout / 雇佣兵战术套装
 
+## 1.3.5 挂载 CD 播放 / Mounted CD playback
+
+修复电子设备挂到背包后，原版 Radio.update() 不再把它视为已装备电台而导致 CD 字幕停止的问题。挂载状态下继续保持声音与字幕；如果同时使用 Survivor's Song 的延长播放，字幕会随整个播放会话持续循环，直到该会话真正结束。
+
+Fixed mounted CD playback when a backpack-attached device is no longer treated as the character's native equipped radio. Audio and subtitles now continue while mounted; with Survivor's Song extended playback, subtitles keep cycling for the full playback session until it actually ends.
 ## 1.3.4 面罩快捷轮盘 / Quick mask wheel
 
 穿戴已升级面罩挂位的战术背包，并把兼容面罩挂到该位置。打开手柄**左方向键轮盘**，选择“戴上面罩”或“脱下面罩”。标签随真实穿戴状态变化；轮盘打开后若更换面罩、转移物品或卸下背包，旧选项不会操作替代物品。键鼠仍可使用现有面罩快捷槽。原版穿脱动作、物品 ID、滤芯、防护属性与挂位关系不作替换。
@@ -74,7 +79,7 @@ Wear the upgraded pack and attach a supported mask to its mask slot. Open the **
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.4
+**Version:** 1.3.5
 
 ---
 
@@ -136,7 +141,7 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.4
+**Version:** 1.3.5
 
 ## License / 许可证
 

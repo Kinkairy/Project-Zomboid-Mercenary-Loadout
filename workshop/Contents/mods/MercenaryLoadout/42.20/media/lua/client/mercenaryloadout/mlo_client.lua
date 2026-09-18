@@ -2483,7 +2483,6 @@ Events.OnFillInventoryObjectContextMenu.Add(onFillInventoryObjectContextMenu)
 
 local pouchReductionEffectByPlayer = {}
 local function onPlayerUpdate(player)
-    M.tickMountedRadioPlayback(player)
     local playerNum=player and player:getPlayerNum() or nil
     if playerNum ~= nil then
         local effect = M.pouchReductionEffect()

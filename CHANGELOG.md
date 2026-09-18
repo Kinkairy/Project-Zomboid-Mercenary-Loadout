@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.5
+
+- 修复电子设备挂到背包后 CD 字幕停止的问题。
+- 挂载 CD 的声音与字幕在背包状态下继续工作。
+- 兼容 Survivor's Song 延长播放：字幕会随整个播放会话持续循环，直到会话结束。
+
+Fixed mounted CD subtitles after the device is stowed on the backpack. Mounted audio/subtitles now continue correctly, including subtitle cycling during Survivor's Song extended playback sessions.
 ## 1.3.4
 
 - 修复已分离口袋的右键菜单、缩小工具箱转移校验范围。
