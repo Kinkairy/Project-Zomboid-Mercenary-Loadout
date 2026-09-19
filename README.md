@@ -11,7 +11,6 @@ Fixed mounted CD playback when a backpack-attached device is no longer treated a
 
 Wear the upgraded pack and attach a supported mask to its mask slot. Open the **D-pad-left utility wheel** and select Wear mask or Remove mask. The callback revalidates the exact item, parent and worn state. Keyboard/mouse players retain the existing mask hotbar toggle. Native actions and original protection/filter state remain unchanged.
 
-1.3.4 的源码与隔离测试不等于实机验收。部署入口和测试范围见 `deploy/1.3.4/README.md` 与 `docs/release-1.3.4/README.md`。
 
 ## 雇佣兵战术套装
 
