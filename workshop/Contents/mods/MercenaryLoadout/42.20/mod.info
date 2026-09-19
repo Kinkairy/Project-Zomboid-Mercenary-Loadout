@@ -1,5 +1,5 @@
 name=Mercenary Tactical Loadout
 id=MercenaryLoadout
 description=Upgrades vanilla backpacks, ALICE webbing, belts, and military armor with modular attachment slots, storage pouches, and equipment access while preserving vanilla behavior. / 为原版背包、爱丽丝背带、皮带和军用护具增加模块化挂载位、独立口袋和装备取用功能，并尽量保持原版操作方式。 / 為原版背包、愛麗絲背帶、皮帶和軍用護具增加模組化掛載位、獨立口袋和裝備取用功能，並盡量保持原版操作方式。
-modversion=1.3.5
+modversion=1.3.6
 versionMin=42.20

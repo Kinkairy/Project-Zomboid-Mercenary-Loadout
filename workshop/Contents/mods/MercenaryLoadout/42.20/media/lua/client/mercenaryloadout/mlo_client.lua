@@ -114,90 +114,6 @@ end
 -- an item here.
 local pendingMountedContainerTransferRefresh = {}
 local pendingInventoryMutation = {}
--- Temporary build16 evidence only: at most 96 item samples per Lua session.
--- Never mutate inventory, request packets or retain a trace beyond one update.
-local pendingContainerTransferTrace = {}
-local containerTransferTraceLines = 0
-local function traceContainerTransfer(action, phase, items)
-    if M.DEBUG_TRANSFER_TRACE ~= true then return false end
-    if containerTransferTraceLines >= 96 then return false end
-    local ok, traced = pcall(function()
-        local source, target = action.srcContainer, action.destContainer
-        local function owner(container)
-            return container and container:getContainingItem() or nil
-        end
-        local sourceOwner, targetOwner = owner(source), owner(target)
-        local function isBox(item)
-            return item and M.VANILLA_CONTAINER_STATE[M.fullType(item)] ~= nil
-        end
-        if not isBox(sourceOwner) and not isBox(targetOwner) then return false end
-        local player = action.character
-        local root = player:getInventory()
-        local data = getPlayerData(player:getPlayerNum())
-        local function location(container)
-            if container == source then return "source" end
-            if container == target then return "target" end
-            if container == root then return "player-root" end
-            return "other"
-        end
-        local function state(container, item)
-            if not container then return "nil" end
-            local idCount, exactCount = 0, 0
-            local list = container:getItems()
-            for i = 0, list:size() - 1 do
-                local entry = list:get(i)
-                if entry:getID() == item:getID() then idCount = idCount + 1 end
-                if entry == item then exactCount = exactCount + 1 end
-            end
-            return idCount .. "/" .. exactCount .. "/" .. tostring(container:isDrawDirty())
-        end
-        local function paneState(page, item)
-            local pane = page and page.inventoryPane
-            if not pane then return "none" end
-            local count, seen = 0, {}
-            for _, group in ipairs(pane.itemslist or {}) do
-                for _, entry in ipairs(group.items or {}) do
-                    if not seen[entry] and entry:getID() == item:getID() then count = count + 1 end
-                    seen[entry] = true
-                end
-            end
-            return location(pane.inventory) .. "/" .. count .. "/"
-                .. tostring(pane.refreshContainerCount)
-        end
-        local box = isBox(targetOwner) and targetOwner or sourceOwner
-        local currentBox
-        local rootItems = root:getItems()
-        for i = 0, rootItems:size() - 1 do
-            local entry = rootItems:get(i)
-            if entry:getID() == box:getID() then currentBox = entry break end
-        end
-        local boxInventory = box:getInventory()
-        local parentRead, innerParent = pcall(function() return boxInventory:getParent() end)
-        for i = 1, math.min(#items, 4) do
-            if containerTransferTraceLines >= 96 then break end
-            local item = items[i]
-            containerTransferTraceLines = containerTransferTraceLines + 1
-            print("[MLO transfer trace] phase=" .. phase .. " item=" .. item:getID() .. "/" .. M.fullType(item)
-                .. " actual=" .. location(item:getContainer())
-                .. " source(id/exact/dirty)=" .. state(source, item)
-                .. " target(id/exact/dirty)=" .. state(target, item)
-                .. " root(id/exact/dirty)=" .. state(root, item)
-                .. " box=" .. box:getID() .. " rootBoxSame=" .. tostring(currentBox == box)
-                .. " boxInner=" .. location(boxInventory)
-                .. " currentInnerSame=" .. tostring(currentBox and currentBox:getInventory() == boxInventory)
-                .. " innerParentIsPlayer=" .. (parentRead and tostring(innerParent == player) or "unknown")
-                .. " currentInner(id/exact/dirty)=" .. state(currentBox and currentBox:getInventory(), item)
-                .. " playerPane(bound/cached/refresh)=" .. paneState(data and data.playerInventory, item)
-                .. " lootPane(bound/cached/refresh)=" .. paneState(data and data.lootInventory, item))
-        end
-        return #items > 0
-    end)
-    if not ok then
-        containerTransferTraceLines = 96
-        M.logOnce("container-transfer-trace", "temporary container trace unavailable; native transfer unchanged")
-    end
-    return ok and traced == true
-end
 local rootExitRelation
 local requestRootExitUnmount
 
@@ -281,8 +197,11 @@ local function mountedTransferBoxes(action)
     -- supported box in selected owned subtrees, including detached boxes.
     local boxes,reason=M.collectOwnedTransportBoxes(player,items)
     if not boxes then return nil,reason end
-    for _,box in ipairs(boxes) do
-        box.parent,box.slot=M.findPersistentMountParent(player,box.item)
+    if #boxes>0 then
+        local snapshot=M.inventorySnapshot(player)
+        for _,box in ipairs(boxes) do
+            box.parent,box.slot=M.findPersistentMountParent(player,box.item,snapshot)
+        end
     end
     return boxes
 end
@@ -301,10 +220,7 @@ local function prepareBoxTransport(owner,player,boxes)
     local state=owner.MLO_transportPrepare
     if not boxes then clearMountedTransferPrepare(owner);return false end
     if not isClient() then
-        for _,box in ipairs(boxes) do
-            if not M.ensureOwnedContainerTransport(player,box.item) then return false end
-        end
-        return true
+        return M.ensureOwnedContainerTransports(player,boxes)
     end
     if #boxes==0 and not state then return true end
     if not state then
@@ -332,9 +248,8 @@ local function prepareBoxTransport(owner,player,boxes)
         return false
     end
     if not state.ready then return nil end
-    for _,box in ipairs(boxes) do
-        local ok=M.ensureOwnedContainerTransport(player,box.item)
-        if not ok then clearMountedTransferPrepare(owner);return false end
+    if not M.ensureOwnedContainerTransports(player,boxes) then
+        clearMountedTransferPrepare(owner);return false
     end
     clearMountedTransferPrepare(owner)
     return true
@@ -363,7 +278,6 @@ local vanillaInventoryTransferPerform = ISInventoryTransferAction.perform
 local vanillaInventoryTransferStop = ISInventoryTransferAction.stop
 function ISInventoryTransferAction:start(...)
     self.MLO_rootExitRelations=nil
-    traceContainerTransfer(self, "before-start", currentTransferItems(self))
     local result=vanillaInventoryTransferStart(self,...)
     -- In multiplayer the stock action may complete the actual move while
     -- perform() is waiting for the transaction acknowledgement. Capture the
@@ -383,15 +297,8 @@ function ISInventoryTransferAction:perform()
         relevant=relevant or isMloRelevantItem(item)
     end
     local result = vanillaInventoryTransferPerform(self)
-    local traced = traceContainerTransfer(self, "after-perform", candidates)
     if player then
         local playerNum=player:getPlayerNum()
-        if traced then
-            pendingContainerTransferTrace[playerNum] = {
-                action={character=player,srcContainer=self.srcContainer,destContainer=self.destContainer},
-                items=candidates,
-            }
-        end
         if relevant then pendingInventoryMutation[playerNum]=true end
         if touchesMountedContainer then
             pendingMountedContainerTransferRefresh[playerNum] = true
@@ -481,6 +388,11 @@ end
 -- on availableSlot.  Present one contiguous view to rendering and translate
 -- every visible input back to the real slot instead of deleting those hooks.
 local function visibleHotbarProjection(hotbar)
+    local hidden=false
+    for _,slot in ipairs(hotbar.availableSlot or {}) do
+        if isHiddenContainerHotbarSlot(slot) then hidden=true;break end
+    end
+    if not hidden then return nil end
     local slots,items,realByVisible,visibleByReal={},{},{},{}
     for realIndex,slot in ipairs(hotbar.availableSlot or {}) do
         if not isHiddenContainerHotbarSlot(slot) then
@@ -495,7 +407,9 @@ local function visibleHotbarProjection(hotbar)
 end
 
 local function withVisibleHotbarProjection(hotbar,callback,...)
+    if hotbar.MLO_visibleProjection then return callback(hotbar,...) end
     local slots,items=visibleHotbarProjection(hotbar)
+    if not slots then return callback(hotbar,...) end
     local realSlots,realItems=hotbar.availableSlot,hotbar.attachedItems
     hotbar.availableSlot,hotbar.attachedItems=slots,items
     hotbar.MLO_visibleProjection=true
@@ -522,6 +436,7 @@ function ISHotbar:getSlotIndexAt(x,y)
         return vanillaHotbarGetSlotIndexAt(self,x,y)
     end
     local _,_,realByVisible=visibleHotbarProjection(self)
+    if not realByVisible then return vanillaHotbarGetSlotIndexAt(self,x,y) end
     local visibleIndex=withVisibleHotbarProjection(self,vanillaHotbarGetSlotIndexAt,x,y)
     return realByVisible[visibleIndex] or -1
 end
@@ -531,12 +446,14 @@ function ISHotbar:getSlotForKey(key)
     local visibleIndex=vanillaHotbarGetSlotForKey(self,key)
     if visibleIndex==-1 then return -1 end
     local _,_,realByVisible=visibleHotbarProjection(self)
+    if not realByVisible then return visibleIndex end
     return realByVisible[visibleIndex] or -1
 end
 
 local vanillaHotbarGetKeyForIndex=ISHotbar.getKeyForIndex
 function ISHotbar:getKeyForIndex(realIndex)
     local _,_,_,visibleByReal=visibleHotbarProjection(self)
+    if not visibleByReal then return vanillaHotbarGetKeyForIndex(self,realIndex) end
     local visibleIndex=visibleByReal[realIndex]
     if not visibleIndex then return 0 end
     return vanillaHotbarGetKeyForIndex(self,visibleIndex)
@@ -1782,11 +1699,6 @@ local function flushMountedContainerTransferRefresh(player)
         pendingMountedContainerTransferRefresh[playerNum] = nil
         refreshInventoryContainers(player)
     end
-    local trace = pendingContainerTransferTrace[playerNum]
-    pendingContainerTransferTrace[playerNum] = nil
-    if trace then
-        traceContainerTransfer(trace.action, refresh and "after-refresh" or "next-update-no-refresh", trace.items)
-    end
 end
 
 local containerSignatures = {}
@@ -2516,7 +2428,6 @@ local function onCreatePlayer(index,player)
     M.clearMountedRadioPlayback(index)
     pendingMountedContainerTransferRefresh[index]=nil
     pendingInventoryMutation[index]=nil
-    pendingContainerTransferTrace[index]=nil
     pendingStateSettles[index]=nil
     pouchReductionEffectByPlayer[index]=nil
     M.clearPouchPlayerState(player)
@@ -2687,6 +2598,8 @@ if M.PocketTransport then
         showCommandFailure(player,M.writeMessagePayload({},M.message(key)))
     end
 end
+
+require "mercenaryloadout/mlo_pocket_ground"
 
 require "mercenaryloadout/mlo_box_trade_client"
 print("[MercenaryLoadout] client loaded "..M.VERSION.." build "..tostring(M.BUILD or 0))

@@ -93,6 +93,23 @@ end
 local function onClientCommand(module,command,player,args)
     if module~=M.MODULE or not player or not args then return end
 
+    if command=="mountedMedia" then
+        -- Never accept another player's item, arbitrary device state or media.
+        -- A hand-off after sending is legal: resolve the same owned root item.
+        local id, index = tonumber(args.itemId), tonumber(args.mediaIndex)
+        if not id or id ~= id or id % 1 ~= 0 or type(args.playing) ~= "boolean"
+            or not index or index ~= index or index % 1 ~= 0 then return end
+        local inventory = player:getInventory()
+        local item = inventory and inventory:getItemWithID(id)
+        if not item or not instanceof(item, "Radio")
+            or item:getContainer() ~= inventory or item:getPlayer() ~= player then return end
+        local data = item:getDeviceData()
+        if not data or data:getMediaIndex() ~= index or not data:hasMedia() then return end
+        if args.playing then data:StartPlayMedia()
+        else data:StopPlayMedia() end
+        return
+    end
+
     if command=="prepareMountedTransfer" then
         local ids=args.boxIds
         local limit=M.CONTAINER_TRANSPORT_LIMIT
@@ -135,14 +152,13 @@ local function onClientCommand(module,command,player,args)
             -- Pointer changes remain reversible until all requested boxes pass.
             -- No item/content/network publication belongs to this preparation.
             local tx=M.newTransaction(player)
+            local requestedBoxes={}
             for _,id in ipairs(ids) do
                 local item=found[tonumber(id)]
-                if not item or not M.ensureOwnedContainerTransport(player,item,tx) then
-                    reason="ownership-changed"
-                    ok=false
-                    break
-                end
+                if not item then ok=false;reason="ownership-changed";break end
+                requestedBoxes[#requestedBoxes+1]={item=item,inventory=item:getInventory()}
             end
+            if ok then ok,reason=M.ensureOwnedContainerTransports(player,requestedBoxes,tx) end
             if not ok then M.rollbackTransaction(tx) end
         end
         M.sendPlayerCommand(player,"mountedTransferPrepared",{

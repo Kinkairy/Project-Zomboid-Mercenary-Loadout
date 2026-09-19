@@ -1,5 +1,119 @@
+require "RadioCom/ISRadioAction"
 local M = MercenaryLoadout
 local players = {}
+
+-- B42.20 GameServer resolves inventory radio packets in hand 1/2 only.
+-- Keep DeviceData as playback authority; bridge just the missing owned-item
+-- request address. Server replies still use the native 8/9 state packets.
+local mediaTails = setmetatable({}, { __mode = "k" })
+local mediaPositions = setmetatable({}, { __mode = "k" })
+local mediaUpdated = setmetatable({}, { __mode = "k" })
+local mediaFrame = 0
+function M.onNativeMediaRequest(data, playing)
+    mediaTails[data] = nil
+    mediaPositions[data] = playing and {index = data:getMediaIndex(), nextLine = 0} or nil
+end
+local function mountedOwner(player, item)
+    return player and item and instanceof(item, "Radio")
+        and item:getContainer() == player:getInventory()
+        and item:getPlayer() == player and item:getAttachedSlot() ~= -1
+        and player:getPrimaryHandItem() ~= item and player:getSecondaryHandItem() ~= item
+end
+
+function M.requestMountedMedia(player, data, playing)
+    if not isClient() or isServer() or not player or not data then return false end
+    local item = data:getParent()
+    if not mountedOwner(player, item) or item:getDeviceData() ~= data then return false end
+    M.onNativeMediaRequest(data, playing)
+    sendClientCommand(player, M.MODULE, "mountedMedia", {
+        itemId = item:getID(), mediaIndex = data:getMediaIndex(), playing = playing == true,
+    })
+    return true
+end
+
+-- Preserve wrapper chaining with extensions regardless of their load order.
+-- The original timed action still owns its effects and session notifications.
+local vanillaToggleMedia = ISRadioAction.performTogglePlayMedia
+function ISRadioAction:performTogglePlayMedia(...)
+    local data = self.deviceData
+    local wasPlaying = data and data:isPlayingMedia()
+    if data then M.onNativeMediaRequest(data, not wasPlaying) end
+    local result = vanillaToggleMedia(self, ...)
+    if data and data:hasMedia() then
+        M.requestMountedMedia(self.character, data, not wasPlaying)
+    end
+    return result
+end
+
+-- No Lua end event exists in B42.20. Observe the final native line and bridge
+-- its trailing hold only, never the playlist, text delivery or replay deadline.
+-- DeviceData's exact B42.20 rule is clamp(Java UTF-16 length / 10 * 60,90,300),
+-- decremented by 1.25 * multiplier per audible native update. Lua # is UTF-8
+-- bytes, so count UTF-16 units explicitly for translated/non-ASCII lines.
+local function nativeTextUnits(text)
+    local units = 0
+    for index = 1, #text do
+        local byte = string.byte(text, index)
+        if byte < 128 or byte >= 192 then units = units + (byte >= 240 and 2 or 1) end
+    end
+    return units
+end
+
+local function observeNativeMediaTail(item, player, guid, line)
+    if not isClient() or not player or not player:isLocalPlayer() then return end
+    local data = item:getDeviceData()
+    if not data or not data:isPlayingMedia() or data:getMediaType() ~= 0 then return end
+    local media = data:getMediaData()
+    if not media then return end
+    local count = media:getLineCount()
+    mediaTails[data] = nil
+    local observed = mediaPositions[data]
+    local position = observed and observed.index == data:getMediaIndex()
+        and observed.nextLine or nil
+    local expected = position and media:getLine(position) or nil
+    if not expected or expected:getTextGuid() ~= guid then
+        -- On reload/late observation, resume only at an unambiguous native
+        -- event. Stock lyrics repeat GUIDs in choruses, so GUID==last alone
+        -- would incorrectly stop at an earlier occurrence of the same line.
+        position = nil
+        for index = 0, count - 1 do
+            if media:getLine(index):getTextGuid() == guid then
+                if position then mediaPositions[data] = nil; return end
+                position = index
+            end
+        end
+    end
+    if position == nil then mediaPositions[data] = nil; return end
+    mediaPositions[data] = {index = data:getMediaIndex(), nextLine = position + 1}
+    if position ~= count - 1 then return end
+    mediaTails[data] = {
+        item = item, player = player, mediaIndex = data:getMediaIndex(),
+        remaining = math.max(90, math.min(300, nativeTextUnits(line) * 6)),
+        frame = mediaFrame,
+    }
+end
+
+local function advanceNativeMediaTails()
+    for data, tail in pairs(mediaTails) do
+        local item, player = tail.item, tail.player
+        if player:isDead() or item:getDeviceData() ~= data
+            or item:getContainer() ~= player:getInventory()
+            or data:getMediaIndex() ~= tail.mediaIndex or not data:isPlayingMedia() then
+            mediaTails[data] = nil
+        elseif tail.frame < mediaFrame
+            and (player:getEquipedRadio() == item or mediaUpdated[data] == mediaFrame)
+            and data:getIsTurnedOn()
+            and data:getDeviceVolume() > 0 and data:getHeadphoneType() >= 0 then
+            tail.remaining = tail.remaining - 1.25 * getGameTime():getMultiplier()
+            if tail.remaining <= 0 then
+                mediaTails[data] = nil
+                if mountedOwner(player, item) then
+                    M.requestMountedMedia(player, data, false)
+                end
+            end
+        end
+    end
+end
 
 local function unregister(state, item)
     if state.registered then
@@ -8,26 +122,35 @@ local function unregister(state, item)
     end
 end
 
--- Native Radio.update() only keeps DeviceData's private FMOD emitter alive while
--- getEquipedRadio() points at the item. A backpack Hotbar attachment is not an
--- equipped radio, so that emitter is cleaned every native item update. Keep the
--- mounted media voice on the owning character emitter instead; this is local
--- audio only and is stopped as soon as the item leaves the mounted-media state.
+-- Use the same native world emitter pool as DeviceData. Explicit ownership
+-- keeps Radio.update() and the pool from reclaiming this mounted-only emitter.
+-- Keep a failed cleanup reachable and retry before allocating another voice.
 local function stopMountedMediaAudio(state)
-    local emitter, sound = state.mediaEmitter, state.mediaSound
-    state.mediaEmitter = nil
-    state.mediaSound = nil
-    if emitter and sound and sound ~= 0 then
-        pcall(function() emitter:stopSound(sound) end)
+    local emitter=state.mediaEmitter
+    if not emitter then return true end
+    local now=getTimestampMs()
+    if state.audioCleanupAt and now<state.audioCleanupAt then return false end
+    local ok,reason=pcall(function()
+        emitter:stopAll()
+        getWorld():returnOwnershipOfEmitter(emitter)
+    end)
+    if not ok then
+        state.audioCleanupAt=now+1000
+        M.logOnce("mounted-audio-cleanup:"..tostring(state.itemId),
+            "mounted radio audio cleanup failed; retry scheduled: "..tostring(reason))
+        return false
     end
+    state.mediaEmitter,state.mediaSound,state.audioCleanupAt=nil,nil,nil
+    return true
 end
 
 function M.clearMountedRadioPlayback(playerNum)
-    for item, state in pairs(players[playerNum] or {}) do
-        unregister(state, item)
-        stopMountedMediaAudio(state)
+    local states=players[playerNum]
+    for item,state in pairs(states or {}) do
+        unregister(state,item)
+        if stopMountedMediaAudio(state) then states[item]=nil end
     end
-    players[playerNum] = nil
+    if not states or not next(states) then players[playerNum]=nil end
 end
 
 -- MP broadcast delivery already owns reception, chat history and mood effects.
@@ -36,6 +159,11 @@ end
 function M.onMountedBroadcastText(guid, codes, x, y, z, line, source)
     if not isClient() or isServer() or not source or not instanceof(source, "Radio") then return end
     local player = source:getPlayer()
+    -- Native Radio.AddDeviceText fires this event only for non-nil codes.
+    -- Event delivery proves that path ran, not that the HUD rendered the line.
+    if player and player:isLocalPlayer() then
+        observeNativeMediaTail(source, player, guid, line)
+    end
     if not player or not player:isLocalPlayer() or player:isDead()
         or source:getContainer() ~= player:getInventory()
         or not player:isAttachedItem(source) or player:isEquipped(source) then return end
@@ -50,258 +178,52 @@ function M.onMountedBroadcastText(guid, codes, x, y, z, line, source)
 end
 Events.OnDeviceText.Add(M.onMountedBroadcastText)
 
--- Build 42.20.3 can report isPlayingMedia=true while the private Java
--- playingMedia pointer is nil after a hand -> mounted transition. In that state
--- DeviceData.updateMediaPlaying() silently does nothing: no error and no next
--- subtitle. Mounted playback therefore mirrors only the public RecordedMedia
--- line progression and feeds each line back through Radio.AddDeviceText(),
--- preserving the stock head-chat/history/codes path.
-
-local function utf8Length(text)
-    text = tostring(text or "")
-    local count = 0
-    for index = 1, #text do
-        local byte = string.byte(text, index)
-        if byte < 128 or byte >= 192 then count = count + 1 end
-    end
-    return count
-end
-
-local function mountedLineCounter(text)
-    local counter = utf8Length(text) / 10 * 60
-    if counter < 90 then return 90 end
-    if counter > 300 then return 300 end
-    return counter
-end
-
-local function beginMountedMediaMirror(item, data, state)
-    local mediaIndex = tonumber(data:getMediaIndex())
-    local okMedia, media = pcall(function() return data:getMediaData() end)
-    M.logOnce("mounted-media-observed:" .. tostring(item:getID()) .. ":" .. tostring(mediaIndex),
-        "mounted media playback observed hasMedia=" .. tostring(data:hasMedia())
-            .. " index=" .. tostring(mediaIndex)
-            .. " mediaData=" .. tostring(okMedia and media ~= nil))
-    if not okMedia then error(media) end
-    if not media then
-        M.logOnce("mounted-media-data:" .. tostring(item:getID()) .. ":" .. tostring(mediaIndex),
-            "mounted media data unavailable index=" .. tostring(mediaIndex))
-        return false
-    end
-    state.mediaMirror = {
-        data = media,
-        mediaIndex = mediaIndex,
-        lineIndex = 0,
-        counter = 150,
-        stopping = false,
-    }
-    local okCount, lineCount = pcall(function() return media:getLineCount() end)
-    M.logOnce("mounted-media-mirror:" .. tostring(item:getID()) .. ":" .. tostring(mediaIndex),
-        "mounted media subtitle mirror active index=" .. tostring(mediaIndex)
-            .. " lines=" .. tostring(okCount and lineCount or "?"))
-    return true
-end
-
-local function dispatchMountedMediaLine(player, item, data, line, mediaIndex, lineIndex)
-    local text = line:getTranslatedText()
-    local r, g, b = line:getR(), line:getG(), line:getB()
-    local guid, codes = line:getTextGuid(), line:getCodes()
-
-    local itemPlayer = nil
-    pcall(function() itemPlayer = item:getPlayer() end)
-    local allowConversation = true
-    pcall(function() allowConversation = player:isAllowConversation() end)
-
-    local equippedRadio = nil
-    pcall(function() equippedRadio = player:getEquipedRadio() end)
-    local equippedRadioOn = nil
-    if equippedRadio and equippedRadio:getDeviceData() then
-        pcall(function() equippedRadioOn = equippedRadio:getDeviceData():getIsTurnedOn() end)
-    end
-
-    local usedDirectFallback = false
-    local fallbackTag = "radio"
-
-    if itemPlayer == player then
-        -- Radio.AddDeviceText ultimately enters IsoGameCharacter.ProcessSay(),
-        -- which silently drops radio lines while allowConversation is false.
-        -- Preserve its normal radio-history/codes path, but temporarily open
-        -- that gate for this media line only.
-        if allowConversation == false then player:setAllowConversation(true) end
-        local ok, reason = pcall(function()
-            item:AddDeviceText(text, r, g, b, guid, codes, 0)
-        end)
-        if allowConversation == false then player:setAllowConversation(false) end
-        if not ok then error(reason) end
-
-        -- IsoGameCharacter.renderlast hides every "radio" chat line when its
-        -- tracked equipped radio exists but is turned off. A backpack-mounted
-        -- CD is not that tracked hand/back-clothing radio, so an unrelated
-        -- stale/off tracked radio can hide otherwise valid mounted subtitles.
-        -- Add one visible fallback line only in that exact hidden-render state.
-        if equippedRadio and equippedRadioOn == false then
-            fallbackTag = "default"
-            player:addLineChatElement(text, r, g, b, UIFont.Medium,
-                data:getDeviceVolumeRange(), fallbackTag,
-                true, true, true, false, false, true)
-            usedDirectFallback = true
-        end
-    else
-        -- The mounted updater already owns the actual player reference. If the
-        -- Radio item's container-parent bridge cannot resolve that same player,
-        -- bypass Radio.getPlayer()/SayRadio for the head subtitle rather than
-        -- silently losing it.
-        fallbackTag = (equippedRadio and equippedRadioOn == false) and "default" or "radio"
-        player:addLineChatElement(text, r, g, b, UIFont.Medium,
-            data:getDeviceVolumeRange(), fallbackTag,
-            true, true, true, false, false, true)
-        pcall(function() item:doReceiveSignal(0) end)
-        if codes ~= nil then
-            triggerEvent("OnDeviceText", guid, codes, -1, -1, -1, text, item)
-        end
-        usedDirectFallback = true
-    end
-
-    print("[MercenaryLoadout] mounted media subtitle line dispatched index="
-        .. tostring(mediaIndex)
-        .. " line=" .. tostring(lineIndex)
-        .. " nextCounter=" .. tostring(mountedLineCounter(text))
-        .. " itemPlayerMatch=" .. tostring(itemPlayer == player)
-        .. " allowConversation=" .. tostring(allowConversation)
-        .. " equippedRadio=" .. tostring(equippedRadio and equippedRadio:getID() or nil)
-        .. " equippedRadioOn=" .. tostring(equippedRadioOn)
-        .. " fallback=" .. tostring(usedDirectFallback)
-        .. " tag=" .. tostring(fallbackTag))
-end
-
-local function mountedExtendedLoopEnabled(item)
-    local ss = SurvivorsSong
-    if not ss or type(ss.isCDPlayer) ~= "function"
-        or type(ss.getPlaybackDurationMinutes) ~= "function" then
-        return false, 0
-    end
-
-    local okDevice, isDevice = pcall(ss.isCDPlayer, item)
-    if not okDevice or isDevice ~= true then return false, 0 end
-
-    local okDuration, duration = pcall(ss.getPlaybackDurationMinutes)
-    duration = okDuration and tonumber(duration) or 0
-    return duration ~= nil and duration > 0, duration or 0
-end
-
-local function advanceMountedMediaMirror(player, item, data, state)
-    local playing = data:isPlayingMedia()
-    if state.mediaPollPlaying ~= playing then
-        state.mediaPollPlaying = playing
-        local mediaIndex = nil
-        pcall(function() mediaIndex = tonumber(data:getMediaIndex()) end)
-        print("[MercenaryLoadout] mounted media state playing=" .. tostring(playing)
-            .. " hasMedia=" .. tostring(data:hasMedia())
-            .. " index=" .. tostring(mediaIndex)
-            .. " item=" .. tostring(item:getID()))
-    end
-
-    if not playing then
-        state.mediaMirror = nil
-        return
-    end
-
-    local mediaIndex = tonumber(data:getMediaIndex())
-    if not state.mediaMirror or state.mediaMirror.mediaIndex ~= mediaIndex then
-        if not beginMountedMediaMirror(item, data, state) then return end
-    end
-
-    local mirror = state.mediaMirror
-    if mirror.stopping then return end
-
-    local multiplier = tonumber(getGameTime():getMultiplier()) or 1
-    mirror.counter = mirror.counter - 1.25 * multiplier
-
-    local now = getTimestampMs()
-    if not mirror.nextProgressLogAt or now >= mirror.nextProgressLogAt then
-        mirror.nextProgressLogAt = now + 5000
-        print("[MercenaryLoadout] mounted media subtitle progress index="
-            .. tostring(mediaIndex)
-            .. " line=" .. tostring(mirror.lineIndex)
-            .. " counter=" .. tostring(mirror.counter)
-            .. " multiplier=" .. tostring(multiplier)
-            .. " playing=" .. tostring(data:isPlayingMedia()))
-    end
-
-    if mirror.counter > 0 then return end
-
-    local line = mirror.data:getLine(mirror.lineIndex)
-    if not line then
-        local extendedLoop, duration = mountedExtendedLoopEnabled(item)
-        if extendedLoop and data:isPlayingMedia() then
-            mirror.loops = (mirror.loops or 0) + 1
-            mirror.lineIndex = 0
-            mirror.counter = 150
-            print("[MercenaryLoadout] mounted media subtitle loop restart index="
-                .. tostring(mediaIndex)
-                .. " loop=" .. tostring(mirror.loops)
-                .. " durationMinutes=" .. tostring(duration))
-            return
-        end
-
-        mirror.stopping = true
-        print("[MercenaryLoadout] mounted media subtitle mirror reached end index="
-            .. tostring(mediaIndex)
-            .. " lines=" .. tostring(mirror.lineIndex)
-            .. " extendedLoop=" .. tostring(extendedLoop))
-        data:StopPlayMedia()
-        return
-    end
-
-    local lineIndex = mirror.lineIndex
-    dispatchMountedMediaLine(player, item, data, line, mediaIndex, lineIndex)
-    mirror.lineIndex = lineIndex + 1
-    mirror.counter = mountedLineCounter(line:getTranslatedText())
+-- Radio.update() skips DeviceData for an unequipped Hotbar item. Advance only
+-- the public native media updater here: it owns the existing line position,
+-- content, stopping tail and MP headphone gate. Do not start another subtitle
+-- clock or infer an extension deadline; playback extensions own their sessions.
+-- In particular, isPlayingMedia may remain true during the SP stopping tail,
+-- even though the private playingMedia pointer has already been cleared.
+local function advanceMountedMedia(data)
+    data:updateMediaPlaying()
+    mediaUpdated[data] = mediaFrame
 end
 
 local function upkeepMediaAudio(player, data, state)
-    -- Headphones keep the original private-listening behavior. With speakers,
-    -- mirror the native RadioTalk loop on the character emitter because the
-    -- Radio item's own DeviceData emitter is destroyed by native Radio.update()
-    -- whenever the item is attached to the backpack instead of held.
-    if not data:isPlayingMedia() or data:getDeviceVolume() <= 0 then
+    if state.audioCleanupAt and not stopMountedMediaAudio(state) then return end
+    if not data:getIsTurnedOn() or not data:isPlayingMedia() or data:getDeviceVolume() <= 0 then
         stopMountedMediaAudio(state)
         return
     end
-    local emitter = player:getEmitter()
-    if not emitter then error("character emitter unavailable") end
-    local playing = false
-    if state.mediaEmitter == emitter and state.mediaSound and state.mediaSound ~= 0 then
-        local ok, value = pcall(function() return emitter:isPlaying(state.mediaSound) end)
-        playing = ok and value == true
+    local emitter=state.mediaEmitter
+    if not emitter then
+        local world=getWorld()
+        emitter=world:getFreeEmitter(player:getX(),player:getY(),math.floor(player:getZ()))
+        if not emitter then error("mounted world emitter unavailable") end
+        world:takeOwnershipOfEmitter(emitter)
+        state.mediaEmitter=emitter
     end
-    if not playing then
-        stopMountedMediaAudio(state)
-        local ok, sound = pcall(function() return emitter:playSoundImpl("RadioTalk", nil) end)
-        if not ok or not sound or sound == 0 then
-            ok, sound = pcall(function() return emitter:playSound("RadioTalk") end)
+    emitter:setPos(player:getX(),player:getY(),math.floor(player:getZ()))
+    if not state.mediaSound or not emitter:isPlaying(state.mediaSound) then
+        -- Three arguments select the IsoObject overload unambiguously in Lua;
+        -- the two-argument nil also matches the native IsoGridSquare overload.
+        state.mediaSound=emitter:playSoundImpl("RadioTalk",false,nil)
+        if not state.mediaSound or state.mediaSound==0 then
+            state.mediaSound=nil
+            error("RadioTalk returned no sound handle")
         end
-        if not ok or not sound or sound == 0 then
-            error(ok and "RadioTalk returned no sound handle" or tostring(sound))
-        end
-        state.mediaEmitter = emitter
-        state.mediaSound = sound
-        local mediaIndex = nil
-        pcall(function() mediaIndex = tonumber(data:getMediaIndex()) end)
-        M.logOnce("mounted-media-audio:" .. tostring(state.itemId or "?"),
-            "mounted media RadioTalk audio active hasMedia=" .. tostring(data:hasMedia())
-                .. " index=" .. tostring(mediaIndex))
+        M.logOnce("mounted-media-audio:"..tostring(state.itemId or "?"),
+            "mounted media native world emitter RadioTalk active index="..tostring(data:getMediaIndex()))
     end
-    local volume = data:getDeviceVolume()
-    local ok, reason = pcall(function()
-        emitter:setVolume(state.mediaSound, volume)
-        -- RadioTalk uses the native DeviceVolume FMOD parameter when it is
-        -- owned by DeviceData. Character emitters do not have that updater, so
-        -- mirror the parameter explicitly when the event exposes it.
-        pcall(function()
-            emitter:setParameterValueByName(state.mediaSound, "DeviceVolume", volume)
-        end)
-    end)
-    if not ok then error(reason) end
+    -- DeviceData.setSoundVolume chooses the event parameter OR direct gain.
+    -- Applying both attenuates parameter-driven radio events twice.
+    local volume=data:getDeviceVolume()
+    if emitter:isUsingParameter(state.mediaSound,"DeviceVolume") then
+        emitter:setParameterValueByName(state.mediaSound,"DeviceVolume",volume)
+    else
+        emitter:setVolume(state.mediaSound,volume)
+    end
+    emitter:tick()
 end
 
 local function upkeepPower(item, data, state, minute)
@@ -338,12 +260,12 @@ local function upkeepPower(item, data, state, minute)
 end
 
 local function upkeepMedia(player, item, data, state)
-    local receiving = not data:isNoTransmit() and not data:isPlayingMedia()
+    local receiving = data:getIsTurnedOn() and not data:isNoTransmit() and not data:isPlayingMedia()
     if not isClient() and receiving and not state.registered then
         getZomboidRadio():RegisterDevice(item)
         state.registered = true
     elseif not receiving then unregister(state, item) end
-    advanceMountedMediaMirror(player, item, data, state)
+    advanceMountedMedia(data)
 end
 
 -- A failure in one branch must not permanently disable unrelated upkeep.
@@ -379,22 +301,27 @@ function M.tickMountedRadioPlayback(player)
     for _, item in pairs(hotbar and hotbar.attachedItems or {}) do
         if item and instanceof(item, "Radio") and item:getContainer() == player:getInventory()
             and item:getAttachedSlot() ~= -1 and not player:isEquipped(item)
-            and player:getPrimaryHandItem() ~= item and player:getSecondaryHandItem() ~= item then
+            and player:getPrimaryHandItem() ~= item and player:getSecondaryHandItem() ~= item
+            and player:getEquipedRadio() ~= item then
             local data = item:getDeviceData()
-            if data and data:getIsTurnedOn() then
+            if data and (data:getIsTurnedOn() or data:isPlayingMedia()) then
                 local minute = getGameTime():getMinutesStamp()
                 local state = states[item]
-                if not state or state.data ~= data then
-                    if state then
-                        unregister(state, item)
-                        stopMountedMediaAudio(state)
+                if state and state.data ~= data then
+                    unregister(state,item)
+                    if stopMountedMediaAudio(state) then
+                        states[item]=nil
+                        state=nil
+                    else
+                        state.seen=true
                     end
+                end
+                if not state then
                     state = {
                         data=data,
                         minute=minute,
                         listen=0,
                         itemId=item:getID(),
-                        mediaPollPlaying=nil,
                     }
                     states[item] = state
                     M.logOnce("mounted-radio:" .. tostring(item:getID()),
@@ -410,19 +337,19 @@ function M.tickMountedRadioPlayback(player)
                 if not state.seen then
                     state.seen = true
                     local now=getTimestampMs()
-                    runUpkeepPhase(item,state,"power",now,function()
-                        upkeepPower(item,data,state,minute)
-                    end)
                     if data:getIsTurnedOn() then
-                        runUpkeepPhase(item,state,"media",now,function()
-                            upkeepMedia(player,item,data,state)
+                        runUpkeepPhase(item,state,"power",now,function()
+                            upkeepPower(item,data,state,minute)
                         end)
-                        runUpkeepPhase(item,state,"audio",now,function()
-                            upkeepMediaAudio(player,data,state)
-                        end)
-                    else
-                        stopMountedMediaAudio(state)
                     end
+                    -- SP must drain its native stopping tail even after power
+                    -- is removed. MP retains the native off/mute/headphone gate.
+                    runUpkeepPhase(item,state,"media",now,function()
+                        upkeepMedia(player,item,data,state)
+                    end)
+                    runUpkeepPhase(item,state,"audio",now,function()
+                        upkeepMediaAudio(player,data,state)
+                    end)
                 end
             end
         end
@@ -430,8 +357,7 @@ function M.tickMountedRadioPlayback(player)
     for item, state in pairs(states) do
         if not state.seen then
             unregister(state, item)
-            stopMountedMediaAudio(state)
-            states[item] = nil
+            if stopMountedMediaAudio(state) then states[item] = nil end
         end
     end
 end
@@ -452,5 +378,7 @@ local function tickAllMountedRadioPlayback()
             M.tickMountedRadioPlayback(player)
         end
     end
+    advanceNativeMediaTails()
+    mediaFrame = mediaFrame + 1
 end
 Events.OnTick.Add(tickAllMountedRadioPlayback)

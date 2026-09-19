@@ -8,6 +8,9 @@ function T.installClient()
     local nativeCreate = createItemTransaction
     local rejected = setmetatable({}, {__mode="k"})
     createItemTransaction = function(character, items, source, destination)
+        if not T.needsPlan(items) then
+            return nativeCreate(character, items, source, destination)
+        end
         local plan, err = T.plan(items, source, destination, character)
         if plan then
             local ok

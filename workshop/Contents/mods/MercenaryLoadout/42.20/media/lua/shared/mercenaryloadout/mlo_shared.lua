@@ -4,9 +4,8 @@ MercenaryAcceptItemFunction = MercenaryAcceptItemFunction or {}
 require "NPCs/BodyLocations"
 
 local M = MercenaryLoadout
-M.VERSION = "1.3.5"
-M.BUILD = 34
-M.DEBUG_TRANSFER_TRACE = false
+M.VERSION = "1.3.6"
+M.BUILD = 35
 M.MODULE = "MercenaryLoadout"
 
 M.TYPE = {
@@ -1242,7 +1241,7 @@ end
 M.CONTAINER_TRANSPORT_LIMIT = 4096
 
 -- Ownership uses actual membership/backrefs, never the stale routing parent.
-function M.isOwnedContainerItem(player, item)
+local function isOwnedContainerItem(player, item, memberships)
     if not player or not item then return false, "missing-item" end
     local root=safeCall(function() return player:getInventory() end,nil)
     if not root then return false, "missing-root" end
@@ -1254,24 +1253,38 @@ function M.isOwnedContainerItem(player, item)
         if not container then return false, "container-not-owned" end
         if seenContainers[container] then return false, "owned-container-cycle" end
         seenContainers[container]=true
-        local values=safeCall(function() return container:getItems() end,nil)
-        local size=values and safeCall(function() return values:size() end,nil) or nil
-        if not size or size<0 or visited+size>M.CONTAINER_TRANSPORT_LIMIT then
-            return false, "owned-container-limit"
+        local entry=memberships[container]
+        if not entry then
+            local values=safeCall(function() return container:getItems() end,nil)
+            local size=values and safeCall(function() return values:size() end,nil) or nil
+            if not size or size<0 or visited+size>M.CONTAINER_TRANSPORT_LIMIT then
+                return false, "owned-container-limit"
+            end
+            entry={size=size,counts={},ids={}}
+            for index=0,size-1 do
+                local candidate=values:get(index)
+                if candidate then
+                    entry.counts[candidate]=(entry.counts[candidate] or 0)+1
+                    local id=safeCall(function() return candidate:getID() end,nil)
+                    if id and id==id then
+                        if entry.ids[id] and entry.ids[id]~=candidate then entry.ids[id]=false
+                        elseif entry.ids[id]==nil then entry.ids[id]=candidate end
+                    end
+                end
+            end
+            memberships[container]=entry
         end
-        local matches=0
+        -- A cached list still consumes the same per-path validation budget.
+        visited=visited+entry.size
+        if visited>M.CONTAINER_TRANSPORT_LIMIT then return false,"owned-container-limit" end
         local currentId=safeCall(function() return tonumber(current:getID()) end,nil)
         if not currentId or currentId~=currentId or currentId%1~=0 then
             return false,"owned-container-invalid-id"
         end
-        for index=0,size-1 do
-            local candidate=values:get(index)
-            visited=visited+1
-            if candidate==current then matches=matches+1
-            elseif currentId~=nil and safeCall(function() return candidate:getID() end,nil)==currentId then
-                return false, "owned-container-duplicate-id"
-            end
+        if entry.ids[currentId]~=nil and entry.ids[currentId]~=current then
+            return false,"owned-container-duplicate-id"
         end
+        local matches=entry.counts[current] or 0
         if matches~=1 then return false, "owned-container-membership-mismatch" end
         if container==root then return true, nil end
         local outer=safeCall(function() return container:getContainingItem() end,nil)
@@ -1283,6 +1296,10 @@ function M.isOwnedContainerItem(player, item)
         current=outer
     end
     return false, "container-not-owned"
+end
+
+function M.isOwnedContainerItem(player, item)
+    return isOwnedContainerItem(player,item,{})
 end
 
 -- Only selected, actually owned subtrees are visited. Clearly off-body items
@@ -1345,7 +1362,7 @@ function M.collectOwnedTransportBoxes(player, items)
         if not item or rootMembers[item] then return nil, "owned-container-membership-mismatch" end
         rootMembers[item]=true
     end
-    local pending,selected,scheduled={},{},{}
+    local pending,selected,scheduled,memberships={},{},{},{}
     local function enqueue(item,container)
         if scheduled[item] then
             if scheduled[item]~=container then return false,"owned-container-membership-mismatch" end
@@ -1364,7 +1381,7 @@ function M.collectOwnedTransportBoxes(player, items)
             if source==root then
                 owned=rootMembers[item]==true
                 reason="owned-container-membership-mismatch"
-            else owned,reason=M.isOwnedContainerItem(player,item) end
+            else owned,reason=isOwnedContainerItem(player,item,memberships) end
             if owned then
                 local queued,queueReason=enqueue(item,source)
                 if not queued then return nil,queueReason end
@@ -1446,6 +1463,24 @@ function M.ensureOwnedContainerTransport(player, item, tx)
     local owned,ownedReason=M.isOwnedContainerItem(player,item)
     if not owned then return false,false,ownedReason end
     return normalizeContainerTransport(player,item,tx)
+end
+
+-- The index lives only inside this synchronous validation batch. Never retain
+-- it on actions/ACK state: every subsequent poll validates current ownership.
+function M.ensureOwnedContainerTransports(player, boxes, tx)
+    local memberships={}
+    for _,box in ipairs(boxes) do
+        local owned,reason=isOwnedContainerItem(player,box.item,memberships)
+        if not owned then return false,reason end
+        if safeCall(function() return box.item:getInventory() end,nil)~=box.inventory then
+            return false,"owned-container-backref-mismatch"
+        end
+    end
+    for _,box in ipairs(boxes) do
+        local ok,_,reason=normalizeContainerTransport(player,box.item,tx)
+        if not ok then return false,reason end
+    end
+    return true
 end
 
 function M.ensureRootContainerTransport(player, item, tx)
@@ -1632,7 +1667,7 @@ function M.inventorySnapshot(player)
             parents[#parents + 1] = item
             for _, slotId in ipairs(M.SLOT_ORDER) do
                 local mountedId = M.getPersistentMountId(item, slotId)
-                if mountedId then
+                if mountedId and not mountByItemId[mountedId] then
                     mountByItemId[mountedId] = { parent = item, slotId = slotId }
                 end
             end
@@ -2310,64 +2345,6 @@ function M.isContainerProxy(item)
     local fullType = M.fullType(item)
     return fullType == M.CONTAINER_PROXY_TYPE.packMedBox
         or fullType == M.CONTAINER_PROXY_TYPE.packToolbox
-end
-
-local function sourceIdentity(item)
-    local md = item:getModData()
-    local mounted = md.MLO_parentId ~= nil
-    local name = mounted and md.MLO_originalName or nil
-    local custom = mounted and md.MLO_originalCustomName or nil
-    local favorite = mounted and md.MLO_originalFavorite or nil
-    local staticModel = mounted and md.MLO_attachmentOriginalStaticModel or nil
-    if name == nil then name = M.displayName(item) end
-    if custom == nil then custom = safeCall(function() return item:isCustomName() end, false) end
-    if favorite == nil then favorite = safeCall(function() return item:isFavorite() end, false) end
-    if staticModel == "" then staticModel = nil end
-    if not mounted then staticModel = safeCall(function() return item:getStaticModel() end, nil) end
-    return name, custom == true, favorite == true, staticModel
-end
-
-function M.createContainerProxyTx(tx, player, parent, source, moduleKey)
-    local proxyType = M.CONTAINER_PROXY_TYPE[moduleKey]
-    if not tx or not player or not parent or not source or not proxyType then
-        return nil, M.message("IGUI_MLO_Error_InvalidContainer")
-    end
-
-    local sourceType = M.fullType(source)
-    local validSource = moduleKey == "packMedBox" and M.TYPE.FIRST_AID[sourceType]
-        or moduleKey == "packToolbox" and M.TYPE.TOOLBOX[sourceType]
-    if not validSource then return nil, M.message("IGUI_MLO_Error_Incompatible") end
-
-    local capacity = safeCall(function() return tonumber(source:getCapacity()) end, nil)
-    local weightReduction = safeCall(function() return tonumber(source:getWeightReduction()) end, nil)
-    local sourceName, sourceCustom, sourceFavorite, sourceStaticModel = sourceIdentity(source)
-    local proxy, createReason = M.createModuleTx(
-        tx, player, parent, proxyType, moduleKey, M.MODULE_NAME_KEY[moduleKey], weightReduction, capacity
-    )
-    if not proxy then return nil, createReason end
-
-    local proxyMd = proxy:getModData()
-    proxyMd.MLO_sourceFullType = sourceType
-    proxyMd.MLO_sourceName = sourceName
-    proxyMd.MLO_sourceCustomName = sourceCustom
-    proxyMd.MLO_sourceFavorite = sourceFavorite
-    proxyMd.MLO_sourceCapacity = capacity
-    proxyMd.MLO_sourceWeightReduction = weightReduction
-    proxyMd.MLO_sourceStaticModel = sourceStaticModel or ""
-    local sourceWeight = safeCall(function() return tonumber(source:getActualWeight()) end,
-        safeCall(function() return tonumber(source:getWeight()) end, nil))
-    if sourceWeight then
-        proxyMd.MLO_sourceWeight = sourceWeight
-        pcall(function() proxy:setActualWeight(sourceWeight) end)
-        pcall(function() proxy:setWeight(sourceWeight) end)
-    end
-    M.markItemDirty(tx, proxy)
-
-    local transferred, transferReason = M.transferContentsTx(tx, source, proxy)
-    if not transferred then return nil, transferReason end
-    local removed, removeReason = M.removeItemTx(tx, source)
-    if not removed then return nil, removeReason end
-    return proxy, nil
 end
 
 function M.restoreContainerSourceTx(tx, player, proxy)
@@ -4540,10 +4517,8 @@ end
 function M.finishArmorSideSwap(tx)
     -- Vanilla has already replaced the parent and emitted its packets/event.
     -- A failed child sync must never roll ownership back to the removed ID.
-    local synced = flushNetwork(tx)
-    tx.undos, tx.networkOps, tx.dirtyItems, tx.newItems = {}, {}, {}, {}
-    tx.equipDirty = false
-    return synced
+    M.commitTransaction(tx)
+    return tx.publicationState == "published"
 end
 
 -- Component shutdown is a metadata-only operation. No source bag is recreated,

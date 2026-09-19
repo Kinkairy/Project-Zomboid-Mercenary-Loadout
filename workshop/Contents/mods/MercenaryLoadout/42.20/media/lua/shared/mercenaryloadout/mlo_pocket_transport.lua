@@ -20,6 +20,15 @@ end
 local function linkedChild(item)
     return M.isFixedPouchItem(item) and not M.isDetachedPouch(item)
 end
+-- Ordinary non-container items cannot carry an MLO sibling group. Let native
+-- validation own that common case; bags still need subtree relevance discovery.
+function T.needsPlan(items)
+    if type(items) ~= "table" then return true end
+    for _,item in ipairs(items) do
+        if inner(item) or linkedParent(item) or linkedChild(item) then return true end
+    end
+    return false
+end
 local function walk(container, visit, seen, count)
     if seen[container] then return nil, "container-cycle" end
     seen[container] = true
@@ -197,12 +206,10 @@ local function preparePlacedBoxes(character, items)
     if not boxes then return nil, reason end
     if #boxes == 0 then return true end
     local tx = M.newTransaction(character)
-    for _, box in ipairs(boxes) do
-        local ok, _, err = M.ensureOwnedContainerTransport(character, box.item, tx)
-        if not ok then
-            M.rollbackTransaction(tx)
-            return nil, err
-        end
+    local ok, err = M.ensureOwnedContainerTransports(character, boxes, tx)
+    if not ok then
+        M.rollbackTransaction(tx)
+        return nil, err
     end
     -- Pointer normalization only: no item movement or publication is queued.
     return true
@@ -213,7 +220,20 @@ function T.installShared()
     require "TimedActions/ISTransferAction"
     require "TimedActions/ISDropWorldItemAction"
     require "TimedActions/ISDropVehicleItemAction"
-    local transfer = ISTransferAction.transferItem
+    local nativeTransfer = ISTransferAction.transferItem
+    local function transfer(self, character, item, src, dst, square)
+        if not T.refreshGroundSquare or (not M.isParent(item) and not M.isFixedPouchItem(item)) then
+            return nativeTransfer(self,character,item,src,dst,square)
+        end
+        local world=item:getWorldItem()
+        local previous=world and world:getSquare() or nil
+        local result=nativeTransfer(self,character,item,src,dst,square)
+        if previous then T.refreshGroundSquare(previous) end
+        world=item:getWorldItem()
+        local current=world and world:getSquare() or nil
+        if current and current~=previous then T.refreshGroundSquare(current) end
+        return result
+    end
     ISTransferAction.transferItem = function(self, character, item, src, dst, square)
         if isServer() or isClient() then
             -- MP native player-to-floor processes one entry at a time. Do not
@@ -248,7 +268,14 @@ function T.installShared()
         end
         return result
     end
-    local complete = ISDropWorldItemAction.complete
+    local nativeComplete = ISDropWorldItemAction.complete
+    local function complete(self)
+        local result=nativeComplete(self)
+        if T.refreshGroundSquare and (M.isParent(self.item) or M.isFixedPouchItem(self.item)) then
+            T.refreshGroundSquare(self.sq)
+        end
+        return result
+    end
     ISDropWorldItemAction.complete = function(self)
         local source = self.character:getInventory()
         local plan, err = T.plan({self.item}, source, nil, self.character)
