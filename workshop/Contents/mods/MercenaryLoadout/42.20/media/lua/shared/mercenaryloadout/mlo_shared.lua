@@ -4,8 +4,8 @@ MercenaryAcceptItemFunction = MercenaryAcceptItemFunction or {}
 require "NPCs/BodyLocations"
 
 local M = MercenaryLoadout
-M.VERSION = "1.3.6"
-M.BUILD = 35
+M.VERSION = "1.3.7"
+M.BUILD = 36
 M.MODULE = "MercenaryLoadout"
 
 M.TYPE = {

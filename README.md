@@ -1,5 +1,9 @@
 # Mercenary Loadout / 雇佣兵战术套装
 
+## 1.3.7 兼容性修复 / Compatibility fixes
+
+修复兼容性问题。 / Fixed compatibility issues.
+
 ## 1.3.6 挂载与落地修复 / Mounted and dropped-item fixes
 
 修复挂载电子设备的声音与字幕持续、快捷栏操作和容器转移边界；升级装备放到地面时，不再把固定附加袋显示成独立物品。继续使用原版物品、容器、转移动作和设备播放流程。
@@ -11,7 +15,7 @@ Fixed mounted-device audio and subtitle continuity, hotbar behavior, container-t
 
 Wear the upgraded pack and attach a supported mask to its mask slot. Open the **D-pad-left utility wheel** and select Wear mask or Remove mask. The callback revalidates the exact item, parent and worn state. Keyboard/mouse players retain the existing mask hotbar toggle. Native actions and original protection/filter state remain unchanged.
 
-Historical 1.3.4 deployment packages and release-only checks are archived outside the active tree. Current source is 1.3.6; see [source index](README.md) and [recovery index](../../docs/RECOVERY.md).
+Historical 1.3.4 deployment packages and release-only checks are archived outside the active tree. Current source is 1.3.7; see [source index](README.md) and [recovery index](../../docs/RECOVERY.md).
 
 ## 雇佣兵战术套装
 
@@ -79,7 +83,7 @@ Historical 1.3.4 deployment packages and release-only checks are archived outsid
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.6
+**Version:** 1.3.7
 
 ---
 
@@ -141,7 +145,7 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.6
+**Version:** 1.3.7
 
 ## License / 许可证
 

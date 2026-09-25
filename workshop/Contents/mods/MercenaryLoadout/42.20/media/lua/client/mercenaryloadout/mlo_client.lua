@@ -1200,6 +1200,47 @@ function ISAttachItemHotbar:forceCancel()
     return vanillaAttachActionForceCancel(self)
 end
 
+-- Vanilla caches fromHotbar when an unequip action is constructed. MLO's
+-- later projection cleanup may legitimately clear the attachment before the
+-- queued action starts or reaches attachConnect/perform. Keep native action
+-- completion, but never pass that cleared location back to setAttachedItem.
+local vanillaUnequipNew=ISUnequipAction.new
+function ISUnequipAction:new(character,item,...)
+    local action=vanillaUnequipNew(self,character,item,...)
+    local slotId=item and item:getAttachedSlotType() or nil
+    action.MLO_fromHotbar=action.fromHotbar and slotId and M.HOTBAR_TEMPLATE[slotId]~=nil or false
+    return action
+end
+
+local function missingMloUnequipLocation(action)
+    return action.MLO_fromHotbar and action.item and action.item:getAttachedToModel()==nil
+end
+
+local vanillaUnequipGetDuration=ISUnequipAction.getDuration
+function ISUnequipAction:getDuration()
+    if missingMloUnequipLocation(self) then self.fromHotbar=false end
+    return vanillaUnequipGetDuration(self)
+end
+
+local vanillaUnequipAnimEvent=ISUnequipAction.animEvent
+function ISUnequipAction:animEvent(event,parameter)
+    if event=="attachConnect" and missingMloUnequipLocation(self) then
+        self:setOverrideHandModels(nil,nil)
+        if self.maxTime==-1 then self:forceComplete() end
+        return
+    end
+    return vanillaUnequipAnimEvent(self,event,parameter)
+end
+
+local vanillaUnequipPerform=ISUnequipAction.perform
+function ISUnequipAction:perform()
+    if missingMloUnequipLocation(self) then
+        self.fromHotbar=false
+        self:setOverrideHandModels(nil,nil)
+    end
+    return vanillaUnequipPerform(self)
+end
+
 local vanillaDetachActionPerform=ISDetachItemHotbar.perform
 function ISDetachItemHotbar:perform()
     local parent,slotId=M.mountedSlotForItem(self.character,self.item)
@@ -1844,7 +1885,11 @@ local function syncPersistentMountProjection(player,force)
                         -- confirms the exact-id parent unlink.  Missing or
                         -- unresolved acknowledgements retry in the lightweight
                         -- per-player timer, outside this inventory projection.
-                    elseif not item or item:getContainer()~=root then
+                    elseif item and item:getContainer()~=root then
+                        -- A missing snapshot entry is not proof of a transfer.
+                        -- The bounded projection retry below waits for it;
+                        -- explicit detach/drop/transfer completion still owns
+                        -- authoritative unmounts when the item has left root.
                         requestPersistentUnmountById(player,parent,slotId,mounted)
                     end
                 end
@@ -1877,8 +1922,9 @@ local function syncPersistentMountProjection(player,force)
         local liveSlot=item:getAttachedSlotType()
         if liveSlot and M.HOTBAR_TEMPLATE[liveSlot] then
             local parent,linkedSlot=M.mountedSlotForItem(player,item,snapshot)
+            local awaitingItem=parent and not M.findById(player,item:getID(),snapshot)
             local shouldRemain=parent and linkedSlot==liveSlot and M.parentEquipped(player,parent)
-                and item:getContainer()==player:getInventory()
+                and (awaitingItem or item:getContainer()==player:getInventory())
                 and not isPendingRootExitItem(player,item,liveSlot,snapshot)
             if not shouldRemain then
                 removeMloProjectionItem(hotbar,item)

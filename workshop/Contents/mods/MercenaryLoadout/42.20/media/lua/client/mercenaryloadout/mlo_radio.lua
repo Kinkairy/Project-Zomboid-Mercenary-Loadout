@@ -150,7 +150,9 @@ function M.clearMountedRadioPlayback(playerNum)
         unregister(state,item)
         if stopMountedMediaAudio(state) then states[item]=nil end
     end
-    if not states or not next(states) then players[playerNum]=nil end
+    -- Kahlua does not expose Lua's next(); retain failed cleanup states.
+    for _ in pairs(states or {}) do return end
+    players[playerNum]=nil
 end
 
 -- MP broadcast delivery already owns reception, chat history and mood effects.
