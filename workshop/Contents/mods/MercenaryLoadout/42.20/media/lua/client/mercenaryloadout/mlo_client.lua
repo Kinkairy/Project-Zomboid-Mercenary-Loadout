@@ -1205,8 +1205,10 @@ end
 -- queued action starts or reaches attachConnect/perform. Keep native action
 -- completion, but never pass that cleared location back to setAttachedItem.
 local vanillaUnequipNew=ISUnequipAction.new
-function ISUnequipAction:new(character,item,...)
-    local action=vanillaUnequipNew(self,character,item,...)
+-- NetTimedAction serializes new() parameters by their exact formal names.
+-- Preserve all native fields even though this client adapter only reads item.
+function ISUnequipAction:new(character,item,maxTimeInit,reason)
+    local action=vanillaUnequipNew(self,character,item,maxTimeInit,reason)
     local slotId=item and item:getAttachedSlotType() or nil
     action.MLO_fromHotbar=action.fromHotbar and slotId and M.HOTBAR_TEMPLATE[slotId]~=nil or false
     return action

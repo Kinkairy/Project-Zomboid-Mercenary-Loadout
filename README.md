@@ -1,5 +1,11 @@
 # Mercenary Loadout / 雇佣兵战术套装
 
+## 1.3.8 联机卸装备修复 / Multiplayer unequip fix
+
+修复多人游戏中面罩、水壶等装备无法卸下的问题，保留原版动作时长及放下、丢弃语义。
+
+Fixed multiplayer unequip failures affecting masks, water bottles and other equipment, preserving native action duration and drop/place behavior.
+
 ## 1.3.7 兼容性修复 / Compatibility fixes
 
 修复兼容性问题。 / Fixed compatibility issues.
@@ -15,7 +21,7 @@ Fixed mounted-device audio and subtitle continuity, hotbar behavior, container-t
 
 Wear the upgraded pack and attach a supported mask to its mask slot. Open the **D-pad-left utility wheel** and select Wear mask or Remove mask. The callback revalidates the exact item, parent and worn state. Keyboard/mouse players retain the existing mask hotbar toggle. Native actions and original protection/filter state remain unchanged.
 
-Historical 1.3.4 deployment packages and release-only checks are archived outside the active tree. Current source is 1.3.7; see [source index](README.md) and [recovery index](../../docs/RECOVERY.md).
+Historical 1.3.4 deployment packages and release-only checks are archived outside the active tree. Current source is 1.3.8; see [source index](README.md) and [recovery index](../../docs/RECOVERY.md).
 
 ## 雇佣兵战术套装
 
@@ -83,7 +89,7 @@ Historical 1.3.4 deployment packages and release-only checks are archived outsid
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.7
+**Version:** 1.3.8
 
 ---
 
@@ -145,7 +151,7 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.7
+**Version:** 1.3.8
 
 ## License / 许可证
 
