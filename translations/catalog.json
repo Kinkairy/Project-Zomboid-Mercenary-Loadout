@@ -1870,6 +1870,30 @@
       "ch": "5%%",
       "reviewed": true,
       "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/Sandbox.json"
+    },
+    {
+      "key": "IGUI_MLO_Radial_WearMask",
+      "en": "Wear mask: %1",
+      "cn": "戴上面罩：%1",
+      "ch": "戴上面罩：%1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Radial_RemoveMask",
+      "en": "Remove mask: %1",
+      "cn": "脱下面罩：%1",
+      "ch": "脫下面罩：%1",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
+    },
+    {
+      "key": "IGUI_MLO_Error_TransportPreparation",
+      "en": "Container transfer preparation failed. Check that the item is still yours and both sides use the same Mod version, then retry.",
+      "cn": "容器转移准备失败。请确认物品仍属于你，且客户端与服务器的 Mod 版本一致，然后重试。",
+      "ch": "容器轉移準備失敗。請確認物品仍屬於你，且用戶端與伺服器的 Mod 版本一致，然後重試。",
+      "reviewed": true,
+      "runtime_group": "workshop/Contents/mods/MercenaryLoadout/42.20/media/lua/shared/Translate/{LOCALE}/IG_UI.json"
     }
   ]
 }

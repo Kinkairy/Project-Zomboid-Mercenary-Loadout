@@ -711,6 +711,7 @@ local function projectionRestoreReady(player)
             if (state.waitTicks or 0)>0 then
                 state.waitTicks=state.waitTicks-1
             elseif (state.requestAttempts or 0)>=M.READINESS_MAX_ATTEMPTS then
+                M.RootCauseDiagnostic.emit("ready.exhausted",player,{attempts=state.requestAttempts})
                 state.exhausted=true
                 state.exhaustedSignature=clothingProjectionSignature(player)
                 projectionDirty[playerNum]=nil
@@ -723,6 +724,7 @@ local function projectionRestoreReady(player)
                 -- A locally successful call is NOT an ACK. Even thrown sends
                 -- consume the bounded attempt so failures cannot spam each frame.
                 local sent=pcall(function()
+                    M.RootCauseDiagnostic.emit("ready.request",player,{attempt=state.requestAttempts,build=M.BUILD})
                     sendClientCommand(player,M.MODULE,"clientReady",{version=M.VERSION,build=M.BUILD})
                 end)
                 if not sent then
@@ -1515,8 +1517,17 @@ local function discoverSidebarContainers(page,player)
     local snapshot={byId={},items={},parents={},mountByItemId={}}
     local parents,detached={},{}
     local seenParents,seenItems,seenContainers={},{},{}
-    local pending={}
-    local root=player:getInventory()
+    local pending,visibleRoots={},{}
+    -- Native buttons grant access to their owner, not every item nested inside
+    -- that owner's inventory. Environmental roots may expose direct equipment;
+    -- the character page exposes equipped equipment only.
+    local function considerParent(item)
+        if item and M.isParent(item) and not seenParents[item]
+            and (not page.onCharacter or M.parentEquipped(player,item)) then
+            seenParents[item]=true
+            parents[#parents+1]=item
+        end
+    end
     local function observe(item)
         if not item or seenItems[item] then return end
         seenItems[item]=true
@@ -1525,12 +1536,6 @@ local function discoverSidebarContainers(page,player)
             local prior=snapshot.byId[id]
             if prior and prior~=item then snapshot.byId[id]=false
             elseif prior==nil then snapshot.byId[id]=item end
-        end
-        if M.isParent(item) and not seenParents[item]
-            and (not page.onCharacter or M.parentEquipped(player,item)
-                or item:getContainer()~=root) then
-            seenParents[item]=true
-            parents[#parents+1]=item
         end
         if M.isDetachedPouch(item) then detached[#detached+1]=item end
     end
@@ -1547,7 +1552,12 @@ local function discoverSidebarContainers(page,player)
         if present and ownerUnchanged and button.onclick and button.inventory==container then
             pending[#pending+1]=container
             local owner=container:getContainingItem()
-            if owner and owner:getInventory()==container then observe(owner) end
+            if owner and owner:getInventory()==container then
+                observe(owner)
+                considerParent(owner)
+            elseif not owner then
+                visibleRoots[container]=true
+            end
         end
     end
     local index=1
@@ -1561,6 +1571,9 @@ local function discoverSidebarContainers(page,player)
                 local item=items:get(i)
                 if item and item:getContainer()==container then
                     observe(item)
+                    if visibleRoots[container] then considerParent(item) end
+                    -- Recursive identity lookup is still needed for linked
+                    -- children and duplicate-ID rejection; it grants no UI access.
                     if item:IsInventoryContainer() then
                         local inner=item:getInventory()
                         if inner and inner:getContainingItem()==item then pending[#pending+1]=inner end
@@ -1607,6 +1620,16 @@ local function discoverSidebarContainers(page,player)
     local fixed={}
     for _,item in ipairs(linked) do
         if ambiguous[item] then owners[item]=nil else fixed[#fixed+1]=item end
+    end
+    if M.RootCauseDiagnostic then
+        local ids={}
+        for _,parent in ipairs(parents) do ids[#ids+1]=tostring(parent:getID())..":"..M.RootCauseDiagnostic.location(parent) end
+        table.sort(ids)
+        local signature=table.concat(ids,";")
+        if page.MLO_diagnosticSidebar~=signature then
+            page.MLO_diagnosticSidebar=signature
+            M.RootCauseDiagnostic.snapshot("sidebar.parents",player,parents,{onCharacter=page.onCharacter==true,fixed=#fixed})
+        end
     end
     return {snapshot=snapshot,parents=parents,detached=detached,fixed=fixed,owners=owners}
 end
@@ -2572,6 +2595,7 @@ local function onServerCommand(module,command,args)
         return
     end
     local player=resolveCommandPlayer(args)
+    if command=="serverReady" then M.RootCauseDiagnostic.emit("ready.ack",player,{recipient=tonumber(args.playerId),resolved=player~=nil,build=tonumber(args.build)}) end
     if not player then return end
 
     if command=="serverReady" then

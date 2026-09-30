@@ -4,9 +4,179 @@ MercenaryAcceptItemFunction = MercenaryAcceptItemFunction or {}
 require "NPCs/BodyLocations"
 
 local M = MercenaryLoadout
-M.VERSION = "1.3.8"
-M.BUILD = 37
+M.VERSION = "1.3.9"
+M.BUILD = 38
 M.MODULE = "MercenaryLoadout"
+
+-- Temporary observational build37 probe. No item writes, compensation, extra
+-- commands, retry changes or network ownership changes belong in this block.
+M.RootCauseDiagnostic = {tag="RC37-4", lines=0, limit=1600, watches={}}
+local D = M.RootCauseDiagnostic
+local function diagSafe(fn, fallback)
+    local ok,value=pcall(fn)
+    if ok then return value end
+    return fallback
+end
+local function diagPack(...) return {n=select("#",...),...} end
+local diagUnpack=unpack or table.unpack
+function D.emit(event,player,fields)
+    -- A failed observer must never prevent the observed game operation.
+    pcall(function()
+        if D.lines>=D.limit then return end
+        D.lines=D.lines+1
+        local parts={"[MLO-"..D.tag.."]",event,
+            "role="..(isServer and isServer() and "server" or (isClient and isClient() and "client" or "single")),
+            "ms="..tostring(getTimestampMs and getTimestampMs() or 0),
+            "player="..tostring(player and diagSafe(function() return player:getOnlineID() end,-1) or -1),
+            "square="..tostring(player and diagSafe(function() return player:getCurrentSquare()~=nil end,false) or false)}
+        local keys={}
+        for key in pairs(fields or {}) do keys[#keys+1]=key end
+        table.sort(keys)
+        for _,key in ipairs(keys) do
+            local value=fields[key]
+            if type(value)=="number" or type(value)=="boolean" or type(value)=="string" then
+                parts[#parts+1]=key.."="..tostring(value):gsub("[\r\n]"," "):sub(1,300)
+            end
+        end
+        print(table.concat(parts," "))
+        if D.lines==D.limit then print("[MLO-"..D.tag.."] log-limit reached; observer silent until reload") end
+    end)
+end
+function D.container(container)
+    if not container then return "nil" end
+    return diagSafe(function()
+        local owner=container:getContainingItem()
+        return tostring(container:getType()).."/owner#"..tostring(owner and owner:getID() or "none")
+    end,"unavailable")
+end
+function D.location(item)
+    return diagSafe(function()
+        local world=item:getWorldItem()
+        local square=world and world:getSquare()
+        if square then return "world:"..square:getX()..","..square:getY()..","..square:getZ() end
+        return D.container(item:getContainer())
+    end,"unavailable")
+end
+function D.snapshot(event,player,items,fields)
+    pcall(function()
+        D.emit(event,player,fields)
+        local pending,seen={},{}
+        for _,item in ipairs(items or {}) do pending[#pending+1]=item end
+        local index=1
+        while index<=#pending and index<=128 do
+            local item=pending[index];index=index+1
+            if item and not seen[item] then
+                seen[item]=true
+                if M.isParent(item) or M.isFixedPouchItem(item) then
+                    local md=item:getModData();local links={}
+                    for key in pairs(M.FIXED_POUCH) do
+                        local id=tonumber(md["MLO_module_"..key])
+                        if id then links[#links+1]=key..":"..id end
+                    end
+                    table.sort(links)
+                    D.emit(event..".item",player,{id=item:getID(),kind=item:getFullType(),where=D.location(item),
+                        parent=tonumber(md.MLO_parentId),module=md.MLO_moduleKey,links=table.concat(links,","),
+                        visual=diagSafe(function() return item:getVisual()~=nil end,false)})
+                end
+                if item:IsInventoryContainer() then
+                    local values=item:getInventory():getItems()
+                    for i=0,values:size()-1 do
+                        if #pending>=128 then break end
+                        pending[#pending+1]=values:get(i)
+                    end
+                end
+            end
+        end
+        if index<=#pending then D.emit(event..".scan-limit",player,{limit=128}) end
+    end)
+end
+function D.call(stage,player,fn,...)
+    D.emit("stage.begin",player,{stage=stage})
+    local result=diagPack(pcall(fn,...))
+    if not result[1] then
+        D.emit("stage.throw",player,{stage=stage,errorType=type(result[2])})
+        error(result[2],0) -- Preserve the exact original error; do not swallow it.
+    end
+    local reason=result[4] or result[3]
+    D.emit("stage.end",player,{stage=stage,result=type(result[2])=="boolean" and tostring(result[2]) or type(result[2]),
+        reason=type(reason)=="table" and reason.key or (type(reason)=="string" and reason or nil)})
+    return diagUnpack(result,2,result.n)
+end
+function D.watch(player,id,plan)
+    pcall(function()
+        local count=0;for _ in pairs(D.watches) do count=count+1 end
+        if count>=32 then D.emit("transfer.watch-limit",player,{limit=32});return end
+        local key=tostring(diagSafe(function() return player:getPlayerNum() end,-1))..":"..tostring(id)
+        local now=getTimestampMs and getTimestampMs() or 0
+        D.watches[key]={player=player,id=id,items=plan.items,source=plan.source,destination=plan.destination,started=now,last=now}
+    end)
+end
+-- Re-resolve IDs because native AddInventoryItem packets can replace the
+-- Lua item object. Old references alone are not evidence of a lost item.
+function D.observe(w,fields)
+    pcall(function()
+        D.snapshot("transfer.references",w.player,w.items,fields)
+        local roots={w.player:getInventory(),w.source,w.destination}
+        if ISInventoryPaneContextMenu and ISInventoryPaneContextMenu.getContainers then
+            local native=ISInventoryPaneContextMenu.getContainers(w.player)
+            for i=0,native:size()-1 do roots[#roots+1]=native:get(i) end
+        end
+        local wanted,found={},{}
+        for _,item in ipairs(w.items) do wanted[tonumber(item:getID())]=true end
+        local index,visited,seen=1,0,{}
+        while index<=#roots and visited<4096 do
+            local container=roots[index];index=index+1
+            if container and not seen[container] then
+                seen[container]=true
+                local items=container:getItems()
+                for i=0,items:size()-1 do
+                    visited=visited+1;if visited>4096 then break end
+                    local item=items:get(i)
+                    if item and item:getContainer()==container then
+                        local id=tonumber(item:getID())
+                        if wanted[id] then
+                            found[id]=(found[id] or 0)+1
+                            D.snapshot("transfer.current",w.player,{item},{transaction=w.id,phase=fields.phase})
+                        end
+                        if item:IsInventoryContainer() then roots[#roots+1]=item:getInventory() end
+                    end
+                end
+            end
+        end
+        for id in pairs(wanted) do
+            D.emit("transfer.lookup",w.player,{transaction=w.id,id=id,matches=found[id] or 0,
+                limited=visited>=4096,phase=fields.phase})
+        end
+    end)
+end
+function D.tick()
+    pcall(function()
+        local now=getTimestampMs and getTimestampMs() or 0
+        for key,w in pairs(D.watches) do
+            if now-w.last>=250 then
+                w.last=now
+                local done=diagSafe(function() return isItemTransactionDone(w.id) end,false)
+                local rejected=diagSafe(function() return isItemTransactionRejected(w.id) end,false)
+                local duration=diagSafe(function() return getItemTransactionDuration(w.id) end,0)
+                local expired=now-w.started>math.max(30000,(tonumber(duration) or 0)+15000)
+                if done or rejected or expired then
+                    -- Native empty-ID queries may report true after action cleanup.
+                    -- Record literal status plus observed owners; never infer atomicity.
+                    if not w.terminal then
+                        w.terminal=now
+                        D.observe(w,{transaction=w.id,done=done,rejected=rejected,expired=expired,
+                            destination=D.container(w.destination),elapsed=now-w.started,phase="native-status"})
+                    elseif now-w.terminal>=2000 then
+                        D.observe(w,{transaction=w.id,done=done,rejected=rejected,expired=expired,
+                            destination=D.container(w.destination),elapsed=now-w.started,phase="delivery-settle"})
+                        D.watches[key]=nil
+                    end
+                end
+            end
+        end
+    end)
+end
+D.emit("loaded",nil,{base=37})
 
 M.TYPE = {
     BELT = { ["Base.Belt2"] = true },

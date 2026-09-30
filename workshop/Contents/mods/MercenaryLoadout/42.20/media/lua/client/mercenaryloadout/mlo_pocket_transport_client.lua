@@ -1,16 +1,20 @@
 require "mercenaryloadout/mlo_pocket_transport"
+require "mercenaryloadout/mlo_split_pickup_client"
 local T = MercenaryLoadout.PocketTransport
 
 function T.installClient()
     if T.clientInstalled then return end
     require "TimedActions/ISInventoryTransferAction"
     require "ISUI/ISTradingUI"
+    local D=MercenaryLoadout.RootCauseDiagnostic
+    if Events and Events.OnTick then Events.OnTick.Add(D.tick) end
     local nativeCreate = createItemTransaction
     local rejected = setmetatable({}, {__mode="k"})
     createItemTransaction = function(character, items, source, destination)
         if not T.needsPlan(items) then
             return nativeCreate(character, items, source, destination)
         end
+        D.snapshot("transfer.request",character,items,{source=D.container(source),destination=D.container(destination)})
         local plan, err = T.plan(items, source, destination, character)
         if plan then
             local ok
@@ -18,12 +22,20 @@ function T.installClient()
             if not ok then plan = nil end
         end
         if not plan then
+            D.emit("transfer.preflight-rejected",character,{reason=err})
             rejected[character] = {source=source, destination=destination}
-            T.reject(character, err)
+            if not (T.prepareSplitPickup and T.prepareSplitPickup(character,items,source,destination,err)) then
+                T.reject(character, err)
+            end
             return 0
         end
         -- One native transaction, containing original object references only.
+        if plan.grouped then D.snapshot("transfer.planned",character,plan.items,{count=#plan.items}) end
         local id = nativeCreate(character, plan.grouped and plan.items or items, source, destination)
+        if plan.grouped then
+            D.emit("transfer.submitted",character,{transaction=id or 0})
+            if id and id~=0 then D.watch(character,id,plan) end
+        end
         if plan.grouped and id and id ~= 0 and T.onNativeTransaction then
             T.onNativeTransaction(character, id, plan)
         end

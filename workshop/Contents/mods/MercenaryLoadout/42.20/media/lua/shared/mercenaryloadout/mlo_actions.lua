@@ -99,14 +99,52 @@ function MLOUpgradeAction:new(character,target,upgradeKey,label,maxTime)
     return o
 end
 
--- Preserve Build 42's complete unequip transaction verbatim. Once vanilla
--- confirms that an MLO parent is no longer equipped, the authoritative side
--- clears only MLO's durable child links in one transaction; the original item
--- instances stay in the character inventory and vanilla owns every visual/UI
--- refresh through OnClothingUpdated.
+-- Preserve Build 42's unequip behavior for ordinary items. An upgraded
+-- container must not use removeWornItem(item)'s default forceDropTooHeavy:
+-- Java may move just that parent to the floor before MLO's grouped transfer
+-- starts. Death then hands the still-root-owned pockets to the corpse.
+local function hasFixedPouchLinks(item)
+    if not item or not M.isParent(item) then return false end
+    local md=item:getModData()
+    for key in pairs(M.FIXED_POUCH) do
+        if md["MLO_module_"..key]~=nil then return true end
+    end
+    return false
+end
+
+local function unequipFixedPouchParent(action)
+    local player,item=action.character,action.item
+    -- Use the native overload which clears equipment without moving inventory.
+    -- A hand-only item has no worn location; never pass a null location to Java.
+    if player:getWornItems():contains(item) then player:removeWornItem(item,false) end
+    if item==player:getPrimaryHandItem() then
+        if (item:isTwoHandWeapon() or item:isRequiresEquippedBothHands())
+            and item==player:getSecondaryHandItem() then player:setSecondaryHandItem(nil) end
+        player:setPrimaryHandItem(nil)
+    end
+    if item==player:getSecondaryHandItem() then
+        if (item:isTwoHandWeapon() or item:isRequiresEquippedBothHands())
+            and item==player:getPrimaryHandItem() then player:setPrimaryHandItem(nil) end
+        player:setSecondaryHandItem(nil)
+    end
+    sendEquip(player)
+    triggerEvent("OnClothingUpdated",player)
+    if isClient() then ISInventoryPage.renderDirty=true end
+    -- Both overflow auto-drop paths are deliberately excluded for linked
+    -- parents. Explicit drop/place still runs its queued grouped native action;
+    -- ordinary unequip retains the original parent and pockets together, even
+    -- while over capacity. A rejected drop or immediate death cannot split them.
+    return true
+end
+
 local vanillaUnequipComplete=ISUnequipAction.complete
 function ISUnequipAction:complete(...)
-    local result=vanillaUnequipComplete(self,...)
+    local result
+    if self.character and hasFixedPouchLinks(self.item) then
+        result=unequipFixedPouchParent(self)
+    else
+        result=vanillaUnequipComplete(self,...)
+    end
     local player=self.character
     local item=self.item
     local authoritative=type(isClient)~="function" or isClient()~=true

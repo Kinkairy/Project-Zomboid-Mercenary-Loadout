@@ -1,6 +1,7 @@
 require "mercenaryloadout/mlo_shared"
 require "mercenaryloadout/mlo_actions"
 local M=MercenaryLoadout
+local D=M.RootCauseDiagnostic
 require "mercenaryloadout/mlo_transport_scope"
 
 M.registerAttachedLocations()
@@ -31,23 +32,24 @@ end
 local migratedPlayers={}
 local function migratePlayerOnce(player,cause)
     if not player then return false end
+    D.emit("migration.enter",player,{cause=cause,cached=migratedPlayers[player]==true})
     if migratedPlayers[player] then return true end
-    if not M.registerAttachedLocations() then return false end
+    if not D.call("registerAttachedLocations",player,M.registerAttachedLocations) then return false end
     local usable,inventory=pcall(function() return player:getInventory() end)
-    if not usable or not inventory then return false end
+    if not usable or not inventory then D.emit("migration.inventory-unavailable",player,{readable=usable});return false end
 
-    local migrated,migratedParents=M.migrateLegacyContainerModules(player)
+    local migrated,migratedParents=D.call("migrateLegacyContainerModules",player,M.migrateLegacyContainerModules,player)
     if not migrated then return false end
-    local orphans=M.reconcileOrphanModules(player)
+    local orphans=D.call("reconcileOrphanModules",player,M.reconcileOrphanModules,player)
     if not orphans then return false end
     -- One-time save repair runs before adopting dev.9's live Hotbar fields, so
     -- the exact vanilla container is healthy before any durable link is made.
-    local containers=M.repairLegacyVanillaContainers(player)
+    local containers=D.call("repairLegacyVanillaContainers",player,M.repairLegacyVanillaContainers,player)
     if not containers then return false end
-    if not M.syncDetachableItems(player) then return false end
-    local adopted,adoptedParents=M.adoptLegacyHotbarMounts(player)
+    if not D.call("syncDetachableItems",player,M.syncDetachableItems,player) then return false end
+    local adopted,adoptedParents=D.call("adoptLegacyHotbarMounts",player,M.adoptLegacyHotbarMounts,player)
     if not adopted then return false end
-    local mounts,mountParents=M.reconcilePersistentMounts(player)
+    local mounts,mountParents=D.call("reconcilePersistentMounts",player,M.reconcilePersistentMounts,player)
     if not mounts then return false end
     for _,parent in ipairs(M.allRecursiveItems(player)) do
         if M.isParent(parent) then
@@ -64,20 +66,22 @@ local function migratePlayerOnce(player,cause)
                             ..slotId.." after "..tostring(cause))
                 end
             end
-            M.ensureAttachmentsProvided(parent)
-            if changed and not pcall(function() parent:syncItemFields() end) then return false end
+            D.emit("migration.parent",player,{id=parent:getID(),changed=changed})
+            D.call("ensureAttachmentsProvided",player,M.ensureAttachmentsProvided,parent)
+            if changed and not D.call("syncItemFields",player,pcall,function() parent:syncItemFields() end) then return false end
         end
     end
-    local modules=M.syncInstalledModules(player,false,nil,true)
-    local attached=M.syncAttachedItems(player,nil,true)
+    local modules=D.call("syncInstalledModules",player,M.syncInstalledModules,player,false,nil,true)
+    local attached=D.call("syncAttachedItems",player,M.syncAttachedItems,player,nil,true)
     if not modules or not attached then return false end
     migratedPlayers[player]=true
     return true
 end
 
 local function migrateAndReady(player,cause)
-    if not M.reconcileComponents(player) then return false end
-    if not migratePlayerOnce(player,cause) then return false end
+    if not D.call("reconcileComponents",player,M.reconcileComponents,player) then return false end
+    if not D.call("migratePlayerOnce",player,migratePlayerOnce,player,cause) then return false end
+    D.emit("ready.send",player,{cause=cause,build=M.BUILD})
     M.sendPlayerCommand(player,"serverReady",{version=M.VERSION,build=M.BUILD})
     return true
 end
@@ -92,6 +96,11 @@ end
 
 local function onClientCommand(module,command,player,args)
     if module~=M.MODULE or not player or not args then return end
+
+    if command=="prepareSplitPocketPickup" then
+        require("mercenaryloadout/mlo_split_pickup").request(player,args)
+        return
+    end
 
     if command=="mountedMedia" then
         -- Never accept another player's item, arbitrary device state or media.
@@ -168,6 +177,7 @@ local function onClientCommand(module,command,player,args)
     end
 
     if command=="clientReady" then
+        D.emit("ready.received",player,{build=tonumber(args.build)})
         migrateAndReady(player,"client-ready")
         return
     end

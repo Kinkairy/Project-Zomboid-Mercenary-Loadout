@@ -1,5 +1,9 @@
 # Mercenary Loadout / 雇佣兵战术套装
 
+## 1.3.9 挂载与升级口袋修复 / Mount and upgraded-pouch fixes
+
+1.3.9：修复挂载恢复、升级装备拾取及嵌套口袋显示异常。 / Fixed mount recovery, upgraded equipment pickup and nested pouch display issues.
+
 ## 1.3.8 联机卸装备修复 / Multiplayer unequip fix
 
 修复多人游戏中面罩、水壶等装备无法卸下的问题，保留原版动作时长及放下、丢弃语义。
@@ -21,7 +25,7 @@ Fixed mounted-device audio and subtitle continuity, hotbar behavior, container-t
 
 Wear the upgraded pack and attach a supported mask to its mask slot. Open the **D-pad-left utility wheel** and select Wear mask or Remove mask. The callback revalidates the exact item, parent and worn state. Keyboard/mouse players retain the existing mask hotbar toggle. Native actions and original protection/filter state remain unchanged.
 
-Historical 1.3.4 deployment packages and release-only checks are archived outside the active tree. Current source is 1.3.8; see [source index](README.md) and [recovery index](../../docs/RECOVERY.md).
+Historical 1.3.4 deployment packages and release-only checks are archived outside the active tree. Current source is 1.3.9; see [source index](README.md) and [recovery index](../../docs/RECOVERY.md).
 
 ## 雇佣兵战术套装
 
@@ -66,7 +70,7 @@ Historical 1.3.4 deployment packages and release-only checks are archived outsid
 - 右键受支持的装备，查看升级需要的材料、部件、工具和技能，按需逐项安装。
 - 装备在可访问的容器中时，满足条件后开始升级，会先自动取到随身物品栏。
 - 穿戴装备后，通过快捷栏管理挂载物品。CD 机、收音机和对讲机可先手持并打开原版设备面板，再次点击关闭面板并收起。
-- 固定口袋各自保留独立空间和内容；装备穿在身上、放在地上或放入其他可访问容器时，都可通过容器侧栏存取。
+- 固定口袋各自保留独立空间和内容；装备穿戴、落地或直接放入可访问的外部容器时均可查看；收进其他箱包后不在外层侧栏展开。
 - 升级后的军用护具仍可左右换穿，口袋、挂件及内容随装备保留。
 
 ## 播放、容器与负重
@@ -89,7 +93,7 @@ Historical 1.3.4 deployment packages and release-only checks are archived outsid
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.8
+**Version:** 1.3.9
 
 ---
 
@@ -136,7 +140,7 @@ Large and Military Backpacks; standard, green and camo ALICE Belt and Suspenders
 - Right-click supported gear to see the materials, components, tools and skills required, then install the upgrades you want.
 - If the gear is in an accessible container, starting an available upgrade automatically retrieves it into your inventory first.
 - Wear the gear and manage attachments through the hotbar. CD players, radios and walkie-talkies can be held to open their native device panel; click again to close the panel and stow the device.
-- Fixed pouches keep separate storage and contents. Access them through the container sidebar while the gear is worn, on the ground or inside another accessible container.
+- Fixed pouches keep separate storage and contents. Access them through the container sidebar while the gear is worn, on the ground or directly in an accessible world container. Gear stored inside another bag does not expose its pouches on the outer sidebar.
 - Upgraded military armor can switch between left and right sides while retaining its pouches, attachments and contents.
 
 ## Sandbox Options
@@ -151,7 +155,7 @@ Supports Project Zomboid Build 42.20, singleplayer, multiplayer and dedicated se
 
 **Workshop ID:** 3794244437
 **Mod ID:** MercenaryLoadout
-**Version:** 1.3.8
+**Version:** 1.3.9
 
 ## License / 许可证
 
